@@ -130,7 +130,7 @@ Pokemon::Pokemon(const std::string& nom, const std::vector<Type>& types, int hp,
 }
 
 // Getters
-std::string Pokemon::getNom() const
+std::string Pokemon::getNom() const 
 {
     return _nom;
 }

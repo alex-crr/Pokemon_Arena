@@ -84,13 +84,10 @@ public:
     
     static std::string typeToString(Type type);
     
-    // Implementation de l'interface Interagir
     virtual std::string interagir() const override;
     
-    // Helper function to get multiplier between attack and defense types
     static double getMultiplicateur(Type typeDefense, Type typeAttaque);
     
-    // Methods to get weaknesses and resistances for a type
     static std::vector<Type> getWeaknesses(Type type);
     static std::vector<Type> getResistances(Type type);
 };

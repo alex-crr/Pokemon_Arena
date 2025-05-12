@@ -79,20 +79,8 @@ std::string Leader::getBadge() const
 void Leader::afficher() const
 {
     std::cout << "Leader: " << getNom() << std::endl;
-    std::cout << "Gymnase: ";
-    switch(_gymnase) {
-        case Gymnase::G1: std::cout << "G1"; break;
-        case Gymnase::G2: std::cout << "G2"; break;
-        case Gymnase::G3: std::cout << "G3"; break;
-        case Gymnase::G4: std::cout << "G4"; break;
-        case Gymnase::G5: std::cout << "G5"; break;
-        case Gymnase::G6: std::cout << "G6"; break;
-        case Gymnase::G7: std::cout << "G7"; break;
-        case Gymnase::G8: std::cout << "G8"; break;
-    }
-    std::cout << std::endl;
+    std::cout << "Gymnase: " << Entraineur::getGymName(_gymnase) << std::endl;
     std::cout << "Badge: " << _badge << std::endl;
-    
     std::cout << "Pokemon:" << std::endl;
     for (int i = 0; i < 6; i++) {
         if (getPokemon(i) != nullptr) {
@@ -100,23 +88,6 @@ void Leader::afficher() const
             getPokemon(i)->afficher();
         }
     }
-}
-
-/**
- * @brief Convertit une chaîne en enum Gymnase
- * @param gymnaseStr Chaîne représentant le gymnase
- * @return Enum Gymnase correspondant
- */
-Entraineur::Gymnase Leader::convertirStringEnGymnase(const std::string& gymnaseStr)
-{
-    if (gymnaseStr == "G1" || gymnaseStr == "Arène d'Argenta") return Gymnase::G1;
-    if (gymnaseStr == "G2" || gymnaseStr == "Arène d'Azuria") return Gymnase::G2;
-    if (gymnaseStr == "G3" || gymnaseStr == "Arène de Carmin") return Gymnase::G3;
-    if (gymnaseStr == "G4" || gymnaseStr == "Arène de Céladopole") return Gymnase::G4;
-    if (gymnaseStr == "G5" || gymnaseStr == "Arène de Parmanie") return Gymnase::G5;
-    if (gymnaseStr == "G6" || gymnaseStr == "Arène de Safrania") return Gymnase::G6;
-    if (gymnaseStr == "G7" || gymnaseStr == "Arène de Cramois'Île") return Gymnase::G7;
-    return Gymnase::G8; // Par défaut
 }
 
 /**
@@ -152,7 +123,7 @@ std::vector<Leader*> Leader::chargerLeaders(const std::string& nomFichier, const
         }
         
         // Créer le leader
-        Gymnase gymnase = convertirStringEnGymnase(gymnaseStr);
+        Gymnase gymnase = Entraineur::convertirStringEnGymnase(gymnaseStr);
         Leader* leader = new Leader(nom, gymnase, badge);
         
         // Associer les pokémons

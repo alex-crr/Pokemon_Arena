@@ -42,4 +42,16 @@ clean:
 run: all
 	$(TARGET)
 
-.PHONY: all clean run directories
+# Règles pour les tests
+TESTS_DIR = tests
+TEST_TARGET = $(BIN_DIR)/Tests.exe
+
+tests: directories $(TEST_TARGET)
+
+$(TEST_TARGET): $(TESTS_DIR)/TestSuite.cpp $(OBJS)
+	$(CXX) $(CXXFLAGS) -I$(INC_DIR) -o $@ $^
+
+run-tests: tests
+	$(TEST_TARGET)
+
+.PHONY: all clean run directories tests run-tests

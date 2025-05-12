@@ -11,6 +11,8 @@
 #include <chrono>
 #include <thread>
 #include <limits>
+#include <locale>    
+#include <clocale>   
 
 // Fonction pour nettoyer la console
 void clearScreen() {
@@ -39,18 +41,9 @@ void afficherMenuLeaders(const std::vector<Leader*>& leaders) {
     clearScreen();
     std::cout << "\n===== LEADERS DISPONIBLES =====" << std::endl;
     for (size_t i = 0; i < leaders.size(); ++i) {
-        std::cout << i + 1 << ". " << leaders[i]->getNom() << " (Gymnase: ";
-        switch(leaders[i]->getGymnase()) {
-            case Entraineur::Gymnase::ARGENTA: std::cout << "Arène d'Argenta"; break;
-            case Entraineur::Gymnase::AZURIA: std::cout << "Arène d'Azuria"; break;
-            case Entraineur::Gymnase::CARMIN: std::cout << "Arène de Carmin sur Mer"; break;
-            case Entraineur::Gymnase::CELADOPOLE: std::cout << "Arène de Céladopole"; break;
-            case Entraineur::Gymnase::PARMANIE: std::cout << "Arène de Parmanie"; break;
-            case Entraineur::Gymnase::SAFRANIA: std::cout << "Arène de Safrania"; break;
-            case Entraineur::Gymnase::CRAMOISILE: std::cout << "Arène de Cramois'Île"; break;
-            case Entraineur::Gymnase::JADIELLE: std::cout << "Arène de Jadielle"; break;
-        }
-        std::cout << ", Badge: " << leaders[i]->getBadge() << ")" << std::endl;
+        std::cout << i + 1 << ". " << leaders[i]->getNom() << " (Gymnase: "
+                 << Entraineur::getGymName(leaders[i]->getGymnase())
+                 << ", Badge: " << leaders[i]->getBadge() << ")" << std::endl;
     }
     std::cout << "0. Retour" << std::endl;
     std::cout << "Votre choix: ";
@@ -183,8 +176,56 @@ Combat* demarrerCombat(Joueur* joueur, Entraineur* entraineur, const std::string
     return combat;
 }
 
+// Add these helper functions to work with the Entraineur's Pokemons array
+void afficherPokemons(const Entraineur* entraineur) {
+    for (int i = 0; i < 6; i++) {
+        Pokemon* pokemon = entraineur->getPokemon(i);
+        if (pokemon != nullptr) {
+            std::cout << i + 1 << ". ";
+            pokemon->afficher();
+        }
+    }
+}
+
+void soignerPokemons(Entraineur* entraineur) {
+    for (int i = 0; i < 6; i++) {
+        Pokemon* pokemon = entraineur->getPokemon(i);
+        if (pokemon != nullptr) {
+            pokemon->soigner();
+        }
+    }
+}
+
+void echangerPokemons(Entraineur* entraineur, int index1, int index2) {
+    if (index1 >= 0 && index1 < 6 && index2 >= 0 && index2 < 6) {
+        Pokemon* temp = entraineur->getPokemon(index1);
+        entraineur->setPokemon(index1, entraineur->getPokemon(index2));
+        entraineur->setPokemon(index2, temp);
+    }
+}
+
+// Helper to count non-null Pokemon
+int countPokemons(const Entraineur* entraineur) {
+    int count = 0;
+    for (int i = 0; i < 6; i++) {
+        if (entraineur->getPokemon(i) != nullptr) {
+            count++;
+        }
+    }
+    return count;
+}
+
 int main() {
     try {
+        try
+        {
+            std::locale::global(std::locale("fr_FR.UTF-8"));
+        }
+        catch (const std::runtime_error& e)
+        {
+            setlocale(LC_ALL, "fr_FR.UTF-8");
+        }
+        
         // Initialiser le générateur de nombres aléatoires
         std::srand(static_cast<unsigned int>(std::time(nullptr)));
         
@@ -206,268 +247,219 @@ int main() {
         
         std::cout << "Bienvenue dans Pokemon Arena!" << std::endl;
         std::cout << "Vous jouez avec " << joueur->getNom() << "." << std::endl;
+        waitForEnter();
         
-        // Stocker les combats effectués
-        std::vector<Combat*> combatsEffectues;
-        
-        bool continuer = true;
-        while (continuer) {
+        // Boucle principale du menu
+        bool running = true;
+        while (running) {
             afficherMenu();
-            int choix = getValidChoice(0, 5);  // Ajusté pour le nouveau menu
+            int choix = getValidChoice(0, 5);
             
-            switch(choix) {
-                case 1: // Gérer mes Pokemon
-                {
-                    bool retourMenuPrincipal = false;
-                    while (!retourMenuPrincipal) {
+            switch (choix) {
+                case 0: // Quitter
+                    running = false;
+                    std::cout << "Merci d'avoir joué à Pokemon Arena!" << std::endl;
+                    break;
+                    
+                case 1: { // Gérer mes Pokemon
+                    bool menuPokemon = true;
+                    while (menuPokemon) {
                         afficherMenuPokemon();
                         int choixPokemon = getValidChoice(0, 4);
                         
-                        switch(choixPokemon) {
-                            case 1: // Afficher mes Pokemon
-                            {
+                        switch (choixPokemon) {
+                            case 0: // Retour
+                                menuPokemon = false;
+                                break;
+                                
+                            case 1: { // Afficher mes Pokemon
                                 clearScreen();
                                 std::cout << "\n===== MES POKEMON =====" << std::endl;
-                                for (int i = 0; i < 6; ++i) {
-                                    Pokemon* pokemon = joueur->getPokemon(i);
-                                    if (pokemon) {
-                                        std::cout << i + 1 << ".\n";
-                                        std::cout << pokemon->getDetailedInfo() << std::endl;
-                                        std::cout << "------------------------" << std::endl;
-                                    }
-                                }
+                                afficherPokemons(joueur);
                                 waitForEnter();
                                 break;
                             }
                                 
-                            case 2: // Soigner mes Pokemon
-                            {
+                            case 2: { // Soigner mes Pokemon
                                 clearScreen();
-                                std::cout << "\nSoigner tous mes Pokemon..." << std::endl;
-                                for (int i = 0; i < 6; ++i) {
-                                    Pokemon* pokemon = joueur->getPokemon(i);
-                                    if (pokemon) {
-                                        pokemon->soigner();
-                                        std::cout << pokemon->getNom() << " a ete soigne! (" 
-                                                 << pokemon->getHp() << "/" << pokemon->getMaxHp() << " PV)" << std::endl;
-                                    }
-                                }
+                                std::cout << "\n===== SOIGNER MES POKEMON =====" << std::endl;
+                                soignerPokemons(joueur);
+                                std::cout << "Tous vos Pokemon ont été soignés!" << std::endl;
                                 waitForEnter();
                                 break;
                             }
-                            
-                            case 3: // Interagir avec mes Pokemon
-                            {
+                                
+                            case 3: { // Interagir avec mes Pokemon
                                 clearScreen();
                                 std::cout << "\n===== INTERAGIR AVEC MES POKEMON =====" << std::endl;
-                                
-                                // Afficher la liste des Pokémon disponibles
-                                std::cout << "Vos Pokemon disponibles:" << std::endl;
-                                bool pokemonTrouves = false;
-                                for (int i = 0; i < 6; ++i) {
-                                    Pokemon* pokemon = joueur->getPokemon(i);
-                                    if (pokemon) {
-                                        pokemonTrouves = true;
-                                        std::cout << i + 1 << ". " << pokemon->getNom() 
-                                                  << " (PV: " << pokemon->getHp() << "/" << pokemon->getMaxHp() << ")" << std::endl;
-                                    }
-                                }
-                                
-                                if (!pokemonTrouves) {
-                                    std::cout << "Vous n'avez pas de Pokemon disponible." << std::endl;
-                                    waitForEnter();
-                                    break;
-                                }
-                                
-                                std::cout << "0. Retour" << std::endl;
-                                std::cout << "Choisissez un Pokemon pour interagir: ";
-                                int choixInteraction = getValidChoice(0, 6);
-                                
-                                if (choixInteraction > 0) {
-                                    Pokemon* pokemon = joueur->getPokemon(choixInteraction - 1);
-                                    if (pokemon) {
+                                int pokemonCount = countPokemons(joueur);
+                                if (pokemonCount == 0) {
+                                    std::cout << "Vous n'avez pas de Pokemon!" << std::endl;
+                                } else {
+                                    // Afficher les Pokemon et permettre de sélectionner
+                                    afficherPokemons(joueur);
+                                    std::cout << "\nChoisissez un Pokemon (1-" 
+                                            << pokemonCount << ") ou 0 pour annuler: ";
+                                    int choixPokemonIndex = getValidChoice(0, pokemonCount);
+                                    
+                                    if (choixPokemonIndex > 0) {
+                                        // Adjust for correct indexing
+                                        int actualIndex = 0;
+                                        int currentCount = 0;
+                                        for (int i = 0; i < 6; i++) {
+                                            if (joueur->getPokemon(i) != nullptr) {
+                                                currentCount++;
+                                                if (currentCount == choixPokemonIndex) {
+                                                    actualIndex = i;
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        
+                                        Pokemon* selectedPokemon = joueur->getPokemon(actualIndex);
                                         clearScreen();
-                                        std::cout << "\n===== INTERACTION AVEC " << pokemon->getNom() << " =====" << std::endl;
-                                        std::cout << pokemon->interagir() << std::endl;
-                                    } else {
-                                        std::cout << "Pas de Pokemon à cette position." << std::endl;
-                                    }
-                                    waitForEnter();
-                                }
-                                break;
-                            }
-                            
-                            case 4: // Changer l'ordre des Pokemon
-                            {
-                                clearScreen();
-                                std::cout << "\n===== CHANGER L'ORDRE DE MES POKEMON =====" << std::endl;
-                                
-                                // Afficher la liste des Pokémon disponibles
-                                std::cout << "Vos Pokemon actuels:" << std::endl;
-                                bool pokemonTrouves = false;
-                                for (int i = 0; i < 6; ++i) {
-                                    Pokemon* pokemon = joueur->getPokemon(i);
-                                    if (pokemon) {
-                                        pokemonTrouves = true;
-                                        std::cout << i + 1 << ". " << pokemon->getNom() 
-                                                  << " (PV: " << pokemon->getHp() << "/" << pokemon->getMaxHp() << ")" << std::endl;
-                                    } else {
-                                        std::cout << i + 1 << ". [vide]" << std::endl;
+                                        std::cout << "Vous interagissez avec " << selectedPokemon->getNom() << "." << std::endl;
+                                        std::cout << selectedPokemon->interagir() << std::endl;
                                     }
                                 }
-                                
-                                if (!pokemonTrouves) {
-                                    std::cout << "Vous n'avez pas de Pokemon disponible." << std::endl;
-                                    waitForEnter();
-                                    break;
-                                }
-                                
-                                std::cout << "\nChoisissez le premier Pokemon à échanger (0 pour annuler): ";
-                                int index1 = getValidChoice(0, 6);
-                                
-                                if (index1 == 0) {
-                                    std::cout << "Échange annulé." << std::endl;
-                                    waitForEnter();
-                                    break;
-                                }
-                                
-                                if (!joueur->getPokemon(index1 - 1)) {
-                                    std::cout << "Emplacement vide sélectionné." << std::endl;
-                                    waitForEnter();
-                                    break;
-                                }
-                                
-                                std::cout << "Choisissez le deuxième Pokemon à échanger (0 pour annuler): ";
-                                int index2 = getValidChoice(0, 6);
-                                
-                                if (index2 == 0 || index1 == index2) {
-                                    std::cout << "Échange annulé." << std::endl;
-                                    waitForEnter();
-                                    break;
-                                }
-                                
-                                // Échanger les Pokémon
-                                Pokemon* temp = joueur->getPokemon(index1 - 1);
-                                joueur->setPokemon(index1 - 1, joueur->getPokemon(index2 - 1));
-                                joueur->setPokemon(index2 - 1, temp);
-                                
-                                std::cout << "Échange effectué avec succès!" << std::endl;
                                 waitForEnter();
                                 break;
                             }
                                 
-                            case 0: // Retour au menu principal
-                                retourMenuPrincipal = true;
+                            case 4: { // Changer l'ordre des Pokemon
+                                clearScreen();
+                                std::cout << "\n===== CHANGER L'ORDRE DE MES POKEMON =====" << std::endl;
+                                int pokemonCount = countPokemons(joueur);
+                                if (pokemonCount < 2) {
+                                    std::cout << "Vous n'avez pas assez de Pokemon pour changer leur ordre!" << std::endl;
+                                } else {
+                                    afficherPokemons(joueur);
+                                    std::cout << "\nChoisissez le premier Pokemon (1-" 
+                                            << pokemonCount << "): ";
+                                    int choixIndex1 = getValidChoice(1, pokemonCount);
+                                    
+                                    std::cout << "Choisissez le deuxième Pokemon (1-" 
+                                            << pokemonCount << "): ";
+                                    int choixIndex2 = getValidChoice(1, pokemonCount);
+                                    
+                                    // Convert display indexes to actual array indexes
+                                    int index1 = -1, index2 = -1;
+                                    int currentCount = 0;
+                                    
+                                    for (int i = 0; i < 6; i++) {
+                                        if (joueur->getPokemon(i) != nullptr) {
+                                            currentCount++;
+                                            if (currentCount == choixIndex1) index1 = i;
+                                            if (currentCount == choixIndex2) index2 = i;
+                                        }
+                                    }
+                                    
+                                    if (index1 != -1 && index2 != -1 && index1 != index2) {
+                                        echangerPokemons(joueur, index1, index2);
+                                        std::cout << "Ordre des Pokemon modifié!" << std::endl;
+                                    }
+                                }
+                                waitForEnter();
                                 break;
+                            }
                         }
                     }
                     break;
                 }
                     
-                case 2: // Afficher mes statistiques
-                {
+                case 2: { // Afficher mes statistiques
                     clearScreen();
                     std::cout << "\n===== MES STATISTIQUES =====" << std::endl;
-                    std::cout << "Joueur: " << joueur->getNom() << std::endl;
-                    std::cout << "Victoires: " << joueur->getNbVictoires() << std::endl;
-                    std::cout << "Defaites: " << joueur->getNbDefaites() << std::endl;
+                    std::cout << "Nom: " << joueur->getNom() << std::endl;
                     std::cout << "Badges: " << joueur->getNbBadges() << std::endl;
+                    std::cout << "Victoires: " << joueur->getNbVictoires() << std::endl;
+                    std::cout << "Défaites: " << joueur->getNbDefaites() << std::endl;
+                    std::cout << "\n===== MES POKEMON =====" << std::endl;
+                    afficherPokemons(joueur);
                     waitForEnter();
                     break;
                 }
                     
-                case 3: // Affronter un Leader de Gymnase
-                {
-                    bool retourMenu = false;
-                    while (!retourMenu) {
+                case 3: { // Affronter un Leader de Gymnase
+                    bool menuLeaders = true;
+                    while (menuLeaders) {
                         afficherMenuLeaders(leaders);
                         int choixLeader = getValidChoice(0, leaders.size());
                         
                         if (choixLeader == 0) {
-                            retourMenu = true;
+                            menuLeaders = false;
                         } else {
-                            Leader* leader = leaders[choixLeader - 1];
-                            Combat* combat = demarrerCombat(joueur, leader, "DÉBUT DU COMBAT");
-                            combatsEffectues.push_back(combat);
-                            retourMenu = true;  // Retour au menu principal après un combat
+                            Leader* selectedLeader = leaders[choixLeader - 1];
+                            Combat* combat = demarrerCombat(joueur, selectedLeader, 
+                                                       "COMBAT CONTRE " + selectedLeader->getNom());
+                            delete combat;
+                            waitForEnter();
+                            menuLeaders = false; // Retour au menu principal après un combat
                         }
                     }
                     break;
                 }
                     
-                case 4: // Affronter un Maitre Pokemon
-                {
+                case 4: { // Affronter un Maitre Pokemon
                     clearScreen();
-                    if (joueur->getNbBadges() < 8) {
-                        std::cout << "\nVous devez obtenir 8 badges pour affronter un Maitre Pokemon!" << std::endl;
-                        std::cout << "Vous avez actuellement " << joueur->getNbBadges() << " badges." << std::endl;
-                    } else {
-                        // Sélectionner un Maître aléatoirement
-                        int indexMaitre = std::rand() % maitres.size();
-                        Maitre* maitre = maitres[indexMaitre];
-                        
-                        std::cout << "\nVous allez affronter le Maitre Pokemon " << maitre->getNom() << "!" << std::endl;
-                        std::this_thread::sleep_for(std::chrono::seconds(2));
-                        
-                        Combat* combat = demarrerCombat(joueur, maitre, "COMBAT DE MAÎTRE POKÉMON");
-                        combatsEffectues.push_back(combat);
+                    std::cout << "\n===== MAITRES POKEMON DISPONIBLES =====" << std::endl;
+                    for (size_t i = 0; i < maitres.size(); ++i) {
+                        std::cout << i + 1 << ". " << maitres[i]->getNom() << std::endl;
+                    }
+                    std::cout << "0. Retour" << std::endl;
+                    std::cout << "Votre choix: ";
+                    
+                    int choixMaitre = getValidChoice(0, maitres.size());
+                    if (choixMaitre > 0) {
+                        Maitre* selectedMaitre = maitres[choixMaitre - 1];
+                        Combat* combat = demarrerCombat(joueur, selectedMaitre, 
+                                                   "COMBAT CONTRE " + selectedMaitre->getNom());
+                        delete combat;
                     }
                     waitForEnter();
                     break;
                 }
                     
-                case 5: // Interagir avec les entraineurs vaincus
-                {
+                case 5: { // Interagir avec les entraineurs vaincus
                     clearScreen();
                     std::cout << "\n===== ENTRAINEURS VAINCUS =====" << std::endl;
+                    std::vector<Entraineur*> vaincus;
                     
-                    // Afficher les leaders vaincus
-                    std::vector<Entraineur*> entraineurs;
+                    // Collecter tous les entraineurs vaincus
                     for (auto leader : leaders) {
-                        if (leader->getEstVaincu()) {
-                            entraineurs.push_back(leader);
+                        if (leader->getEstVaincu()) { // Changed from estVaincu() to getEstVaincu()
+                            vaincus.push_back(leader);
                         }
                     }
                     
-                    // Afficher les maîtres vaincus
                     for (auto maitre : maitres) {
-                        if (maitre->getEstVaincu()) {
-                            entraineurs.push_back(maitre);
+                        if (maitre->getEstVaincu()) { // Changed from estVaincu() to getEstVaincu()
+                            vaincus.push_back(maitre);
                         }
                     }
                     
-                    if (entraineurs.empty()) {
-                        std::cout << "Vous n'avez vaincu aucun entraineur pour le moment." << std::endl;
-                        waitForEnter();
-                        break;
+                    if (vaincus.empty()) {
+                        std::cout << "Vous n'avez vaincu aucun entraineur pour l'instant." << std::endl;
+                    } else {
+                        for (size_t i = 0; i < vaincus.size(); ++i) {
+                            std::cout << i + 1 << ". " << vaincus[i]->getNom() << std::endl;
+                        }
+                        std::cout << "0. Retour" << std::endl;
+                        std::cout << "Choisissez un entraineur avec qui interagir: ";
+                        
+                        int choixVaincu = getValidChoice(0, vaincus.size());
+                        if (choixVaincu > 0) {
+                            Entraineur* selectedVaincu = vaincus[choixVaincu - 1];
+                            clearScreen();
+                            std::cout << "\n===== INTERACTION AVEC " << selectedVaincu->getNom() << " =====" << std::endl;
+                            std::cout << selectedVaincu->getNom() << " : \"Vous m'avez battu, mais je m'entraîne dur pour notre revanche!\"" << std::endl;
+                            
+                            // On pourrait ajouter d'autres interactions ici
+                        }
                     }
-                    
-                    // Afficher la liste des entraineurs vaincus
-                    for (size_t i = 0; i < entraineurs.size(); ++i) {
-                        std::string type = dynamic_cast<Maitre*>(entraineurs[i]) ? "Maitre" : "Leader";
-                        std::cout << i + 1 << ". " << type << " " << entraineurs[i]->getNom() << std::endl;
-                    }
-                    
-                    std::cout << "0. Retour" << std::endl;
-                    std::cout << "Choisissez un entraineur pour interagir: ";
-                    
-                    int choixEntraineur = getValidChoice(0, entraineurs.size());
-                    
-                    if (choixEntraineur > 0) {
-                        Entraineur* entraineurChoisi = entraineurs[choixEntraineur - 1];
-                        clearScreen();
-                        std::cout << "\n===== INTERACTION AVEC " << entraineurChoisi->getNom() << " =====" << std::endl;
-                        std::cout << entraineurChoisi->interagir() << std::endl;
-                        waitForEnter();
-                    }
+                    waitForEnter();
                     break;
                 }
-                
-                case 0: // Quitter
-                    clearScreen();
-                    std::cout << "Merci d'avoir joue! A bientot!" << std::endl;
-                    continuer = false;
-                    break;
             }
         }
         
@@ -486,10 +478,6 @@ int main() {
         
         for (auto maitre : maitres) {
             delete maitre;
-        }
-        
-        for (auto combat : combatsEffectues) {
-            delete combat;
         }
     }
     catch (const std::exception& e) {

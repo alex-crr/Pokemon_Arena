@@ -28,6 +28,4 @@ public:
     virtual void afficher() const override;
     
     static std::vector<Leader*> chargerLeaders(const std::string& nomFichier, const std::vector<Pokemon*>& pokemons);
-    
-    static Gymnase convertirStringEnGymnase(const std::string& gymnaseStr);
 };

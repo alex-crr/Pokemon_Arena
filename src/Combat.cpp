@@ -224,3 +224,4 @@ std::string Combat::interagir() const
     
     return ss.str();
 }
+

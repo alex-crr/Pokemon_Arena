@@ -45,4 +45,18 @@ public:
     
     // Implementation de l'interface Interagir
     virtual std::string interagir() const override;
+
+    /**
+     * Returns the full name of a gym based on its enum value
+     * @param gym The Gymnase enum value
+     * @return The full display name of the gym
+     */
+    static std::string getGymName(Gymnase gym);
+    
+    /**
+     * Convertit une chaîne en enum Gymnase
+     * @param gymnaseStr Chaîne représentant le gymnase
+     * @return Enum Gymnase correspondant
+     */
+    static Gymnase convertirStringEnGymnase(const std::string& gymnaseStr);
 };

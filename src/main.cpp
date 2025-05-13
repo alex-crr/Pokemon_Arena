@@ -193,8 +193,7 @@ int main() {
                             menuLeaders = false;
                         } else {
                             Leader* selectedLeader = leaders[choixLeader - 1];
-                            Combat* combat = UI::demarrerCombat(joueur, selectedLeader, 
-                                                       "COMBAT CONTRE " + selectedLeader->getNom());
+                            Combat* combat = UI::demarrerCombat(joueur, selectedLeader);
                             delete combat;
                             UI::waitForEnter();
                             menuLeaders = false; // Retour au menu principal après un combat
@@ -215,8 +214,7 @@ int main() {
                     int choixMaitre = UI::getValidChoice(0, maitres.size());
                     if (choixMaitre > 0) {
                         Maitre* selectedMaitre = maitres[choixMaitre - 1];
-                        Combat* combat = UI::demarrerCombat(joueur, selectedMaitre, 
-                                                   "COMBAT CONTRE " + selectedMaitre->getNom());
+                        Combat* combat = UI::demarrerCombat(joueur, selectedMaitre);
                         delete combat;
                     }
                     UI::waitForEnter();

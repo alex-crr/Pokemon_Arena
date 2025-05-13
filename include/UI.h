@@ -22,7 +22,7 @@ public:
     
     // Combat-related functions
     static void afficherMessagesCombat(const std::vector<std::string>& messages, const std::string& titreEntete);
-    static Combat* demarrerCombat(Joueur* joueur, Entraineur* entraineur, const std::string& titreCombat);
+    static Combat* demarrerCombat(Joueur* joueur, Entraineur* entraineur);
     
     // Pokemon-related functions
     static void afficherPokemons(const Entraineur* entraineur);

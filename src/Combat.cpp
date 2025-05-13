@@ -294,7 +294,7 @@ std::string Combat::interagir() const
 
 void Combat::afficher() const
 {
-    const int width = 80;
+    const int width = 100; // Increased from 80 to provide more space
     UI::clearScreen();
     
     // Get current active Pokemon
@@ -320,27 +320,38 @@ void Combat::afficher() const
     std::string p2Display = pokemon2->getNom() + " (" + std::to_string(pokemon2->getHp()) + 
                            "/" + std::to_string(pokemon2->getMaxHp()) + " PV)";
     
-    // Left side - Player's Pokemon
-    std::cout << "| " << std::left << std::setw(width/2 - 2) << _entraineur1->getNom()
-              << std::right << std::setw(width/2 - 1) << _entraineur2->getNom() << " |" << std::endl;
+    // Left side - Player's Pokemon, Right side - Opponent's Pokemon
+    int halfWidth = width / 2 - 2; // Account for the "| " at start and " |" at end
+    std::cout << "| " << std::left << std::setw(halfWidth) << _entraineur1->getNom()
+              << " | " << std::left << std::setw(halfWidth) << _entraineur2->getNom() << " |" << std::endl;
     
-    // HP bars visualization
-    std::cout << "| " << std::left << std::setw(width/2 - 2) << p1Display 
-              << std::right << std::setw(width/2 - 1) << p2Display << " |" << std::endl;
+    // HP displays
+    std::cout << "| " << std::left << std::setw(halfWidth) << p1Display 
+              << " | " << std::left << std::setw(halfWidth) << p2Display << " |" << std::endl;
     
-    // Visual HP bars
+    // Visual HP bars with better spacing
     int barWidth = width / 4;
     
     // Player Pokemon HP bar
     int p1HPWidth = static_cast<int>(static_cast<double>(pokemon1->getHp()) / pokemon1->getMaxHp() * barWidth);
     std::cout << "| [" << std::string(p1HPWidth, '=') << std::string(barWidth - p1HPWidth, ' ') << "]";
     
+    // Fill space between bars
+    int spaceBetweenBars = halfWidth - barWidth - 1;
+    std::cout << std::string(spaceBetweenBars, ' ');
+    
+    // Separator
+    std::cout << " | ";
+    
     // Opponent Pokemon HP bar
     int p2HPWidth = static_cast<int>(static_cast<double>(pokemon2->getHp()) / pokemon2->getMaxHp() * barWidth);
-    std::cout << std::string(width - 2 * barWidth - 7, ' ');
-    std::cout << "[" << std::string(p2HPWidth, '=') << std::string(barWidth - p2HPWidth, ' ') << "] |" << std::endl;
+    std::cout << "[" << std::string(p2HPWidth, '=') << std::string(barWidth - p2HPWidth, ' ') << "]";
     
-    std::cout << "|" << std::string(width, ' ') << "|" << std::endl;
+    // Fill remaining space
+    std::cout << std::string(halfWidth - barWidth - 1, ' ') << " |" << std::endl;
+    
+    // Separator line
+    std::cout << "|" << std::string(width, '-') << "|" << std::endl;
     
     // Pokemon details
     std::string p1Types = "";
@@ -355,68 +366,62 @@ void Combat::afficher() const
         p2Types += Pokemon::typeToString(type);
     }
     
-    std::cout << "| Type(s): " << std::left << std::setw(width/2 - 11) << p1Types 
-              << "Type(s): " << std::left << std::setw(width/2 - 10) << p2Types << " |" << std::endl;
+    // Types with proper alignment
+    std::cout << "| Type(s): " << std::left << std::setw(halfWidth - 9) << p1Types 
+              << " | Type(s): " << std::left << std::setw(halfWidth - 9) << p2Types << " |" << std::endl;
               
-    std::cout << "| Attaque: " << std::left << std::setw(width/2 - 11) << pokemon1->getNomAttaque() 
-              << "Attaque: " << std::left << std::setw(width/2 - 10) << pokemon2->getNomAttaque() << " |" << std::endl;
+    // Attacks with proper alignment
+    std::cout << "| Attaque: " << std::left << std::setw(halfWidth - 10) << pokemon1->getNomAttaque() 
+              << " | Attaque: " << std::left << std::setw(halfWidth - 10) << pokemon2->getNomAttaque() << " |" << std::endl;
               
-    std::cout << "|" << std::string(width, ' ') << "|" << std::endl;
+    // Separator line
+    std::cout << "|" << std::string(width, '-') << "|" << std::endl;
     
-    // Team overview
-    // Trainer 1's team
-    std::cout << "| Équipe de " << _entraineur1->getNom() << ":" << std::string(width - 15 - _entraineur1->getNom().length(), ' ') << " |" << std::endl;
+    // Team overview with proper spacing
+    std::cout << "| Équipe de " << _entraineur1->getNom() << ":" 
+              << std::string(halfWidth - 12 - _entraineur1->getNom().length(), ' ')
+              << " | Équipe de " << _entraineur2->getNom() << ":" 
+              << std::string(halfWidth - 12 - _entraineur2->getNom().length(), ' ') << " |" << std::endl;
     
-    // Display Pokemon in two rows of 3
-    for (int i = 0; i < 6; i += 3) {
-        std::stringstream teamRow;
-        for (int j = i; j < i+3 && j < 6; ++j) {
-            Pokemon* p = _entraineur1->getPokemon(j);
-            if (p) {
-                teamRow << "  ";
-                // Highlight active Pokemon
-                if (j == _indexPokemon1) teamRow << "[*] ";
-                else teamRow << "[" << j+1 << "] ";
-                
-                teamRow << std::left << std::setw(10) << p->getNom();
-                if (p->getHp() <= 0) teamRow << " (KO)";
-                else teamRow << " (" << p->getHp() << "/" << p->getMaxHp() << ")";
-                teamRow << "  ";
-            }
+    // Display Pokemon in two columns, each trainer's team on one side
+    for (int i = 0; i < 6; ++i) {
+        std::stringstream team1Row, team2Row;
+        
+        // Trainer 1's Pokemon
+        Pokemon* p1 = _entraineur1->getPokemon(i);
+        if (p1) {
+            // Highlight active Pokemon
+            if (i == _indexPokemon1) team1Row << "[*] ";
+            else team1Row << "[" << i+1 << "] ";
+            
+            team1Row << std::left << std::setw(10) << p1->getNom();
+            if (p1->getHp() <= 0) team1Row << " (KO)";
+            else team1Row << " (" << p1->getHp() << "/" << p1->getMaxHp() << ")";
         }
-        std::cout << "| " << std::left << std::setw(width-2) << teamRow.str() << " |" << std::endl;
+        
+        // Trainer 2's Pokemon
+        Pokemon* p2 = _entraineur2->getPokemon(i);
+        if (p2) {
+            // Highlight active Pokemon
+            if (i == _indexPokemon2) team2Row << "[*] ";
+            else team2Row << "[" << i+1 << "] ";
+            
+            team2Row << std::left << std::setw(10) << p2->getNom();
+            if (p2->getHp() <= 0) team2Row << " (KO)";
+            else team2Row << " (" << p2->getHp() << "/" << p2->getMaxHp() << ")";
+        }
+        
+        // Output the row with proper padding
+        std::cout << "| " << std::left << std::setw(halfWidth) << team1Row.str() 
+                  << " | " << std::left << std::setw(halfWidth) << team2Row.str() << " |" << std::endl;
     }
     
-    std::cout << "|" << std::string(width, ' ') << "|" << std::endl;
+    // Separator line
+    std::cout << "|" << std::string(width, '-') << "|" << std::endl;
     
-    // Trainer 2's team
-    std::cout << "| Équipe de " << _entraineur2->getNom() << ":" << std::string(width - 15 - _entraineur2->getNom().length(), ' ') << " |" << std::endl;
-    
-    for (int i = 0; i < 6; i += 3) {
-        std::stringstream teamRow;
-        for (int j = i; j < i+3 && j < 6; ++j) {
-            Pokemon* p = _entraineur2->getPokemon(j);
-            if (p) {
-                teamRow << "  ";
-                // Highlight active Pokemon
-                if (j == _indexPokemon2) teamRow << "[*] ";
-                else teamRow << "[" << j+1 << "] ";
-                
-                teamRow << std::left << std::setw(10) << p->getNom();
-                if (p->getHp() <= 0) teamRow << " (KO)";
-                else teamRow << " (" << p->getHp() << "/" << p->getMaxHp() << ")";
-                teamRow << "  ";
-            }
-        }
-        std::cout << "| " << std::left << std::setw(width-2) << teamRow.str() << " |" << std::endl;
-    }
-    
-    std::cout << "|" << std::string(width, ' ') << "|" << std::endl;
-    
-    // Combat log section
-    std::cout << "+" << std::string(width, '-') << "+" << std::endl;
+    // Combat log section with proper width
     std::cout << "| " << std::left << std::setw(width-2) << "JOURNAL DE COMBAT" << " |" << std::endl;
-    std::cout << "+" << std::string(width, '-') << "+" << std::endl;
+    std::cout << "|" << std::string(width, '-') << "|" << std::endl;
     
     // Display only the most recent messages (up to 5)
     size_t messageCount = _messages.size();
@@ -448,6 +453,7 @@ void Combat::afficher() const
         std::cout << "| " << std::string(width-2, ' ') << " |" << std::endl;
     }
     
+    // Bottom border
     std::cout << "+" << std::string(width, '-') << "+" << std::endl;
 }
 

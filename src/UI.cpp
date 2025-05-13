@@ -148,7 +148,7 @@ void UI::afficherMessagesCombat(const std::vector<std::string>& messages, const 
     }
 }
 
-Combat* UI::demarrerCombat(Joueur* joueur, Entraineur* entraineur, const std::string& titreCombat) {
+Combat* UI::demarrerCombat(Joueur* joueur, Entraineur* entraineur) {
     Combat* combat = new Combat(joueur, entraineur);
     std::vector<std::string> messages = combat->demarrer();
     

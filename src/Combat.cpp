@@ -336,7 +336,7 @@ void Combat::afficher() const
     int p1HPWidth = static_cast<int>(static_cast<double>(pokemon1->getHp()) / pokemon1->getMaxHp() * barWidth);
     std::cout << "| [" << std::string(p1HPWidth, '=') << std::string(barWidth - p1HPWidth, ' ') << "]";
     
-    // Fill space between bars
+    // Fix spacing between bars by calculating exact needed space
     int spaceBetweenBars = halfWidth - barWidth - 1;
     std::cout << std::string(spaceBetweenBars, ' ');
     
@@ -347,8 +347,9 @@ void Combat::afficher() const
     int p2HPWidth = static_cast<int>(static_cast<double>(pokemon2->getHp()) / pokemon2->getMaxHp() * barWidth);
     std::cout << "[" << std::string(p2HPWidth, '=') << std::string(barWidth - p2HPWidth, ' ') << "]";
     
-    // Fill remaining space
-    std::cout << std::string(halfWidth - barWidth - 1, ' ') << " |" << std::endl;
+    // Fix remaining space calculation
+    int remainingSpace = halfWidth - barWidth - 1;
+    std::cout << std::string(remainingSpace, ' ') << " |" << std::endl;
     
     // Separator line
     std::cout << "|" << std::string(width, '-') << "|" << std::endl;
@@ -366,22 +367,29 @@ void Combat::afficher() const
         p2Types += Pokemon::typeToString(type);
     }
     
-    // Types with proper alignment
+    // Fix types padding to ensure alignment
     std::cout << "| Type(s): " << std::left << std::setw(halfWidth - 9) << p1Types 
               << " | Type(s): " << std::left << std::setw(halfWidth - 9) << p2Types << " |" << std::endl;
               
-    // Attacks with proper alignment
+    // Fix attacks padding to ensure alignment
     std::cout << "| Attaque: " << std::left << std::setw(halfWidth - 10) << pokemon1->getNomAttaque() 
               << " | Attaque: " << std::left << std::setw(halfWidth - 10) << pokemon2->getNomAttaque() << " |" << std::endl;
               
     // Separator line
     std::cout << "|" << std::string(width, '-') << "|" << std::endl;
     
-    // Team overview with proper spacing
+    // Fix team overview padding
+    int teamTitlePadding1 = halfWidth - 12 - _entraineur1->getNom().length();
+    int teamTitlePadding2 = halfWidth - 12 - _entraineur2->getNom().length();
+    
+    // Ensure non-negative padding
+    if (teamTitlePadding1 < 0) teamTitlePadding1 = 0;
+    if (teamTitlePadding2 < 0) teamTitlePadding2 = 0;
+    
     std::cout << "| Équipe de " << _entraineur1->getNom() << ":" 
-              << std::string(halfWidth - 12 - _entraineur1->getNom().length(), ' ')
+              << std::string(teamTitlePadding1, ' ')
               << " | Équipe de " << _entraineur2->getNom() << ":" 
-              << std::string(halfWidth - 12 - _entraineur2->getNom().length(), ' ') << " |" << std::endl;
+              << std::string(teamTitlePadding2, ' ') << " |" << std::endl;
     
     // Display Pokemon in two columns, each trainer's team on one side
     for (int i = 0; i < 6; ++i) {

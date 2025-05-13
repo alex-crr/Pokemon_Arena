@@ -8,7 +8,7 @@ class Entraineur : public Interagir {
 protected: 
     const std::string _nom;
     std::array<Pokemon*, 6> _pokemons; 
-    bool _estVaincu;  // Ajout d'un attribut pour savoir si l'entraineur a été vaincu
+    bool _estVaincu;  
 
 public:
     // Constructeur
@@ -28,15 +28,15 @@ public:
     void setPokemon(int index, Pokemon* pokemon);
     void setEstVaincu(bool estVaincu);
     
-    // Other methods
-    virtual void afficher() const;
+    // Autre
     virtual bool estKO() const;
     
     // Implementation de l'interface Interagir
-    virtual std::string interagir() const override;
+    virtual std::string interagir() const override;    
+    virtual void afficher() const;
     
-    // Pokemon management methods
+    // Pokemons
     void soignerPokemons();
     void echangerPokemons(int index1, int index2);
-    int countPokemons() const; // Added count method
+    int countPokemons() const; 
 };

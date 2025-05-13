@@ -15,8 +15,6 @@
 #include <locale>    
 #include <clocale>   
 
-// Removed helper functions that are now in UI.cpp
-
 int main() {
     try {
         try
@@ -47,7 +45,7 @@ int main() {
             throw std::runtime_error("Erreur de chargement des donnees!");
         }
         
-        // Utiliser le premier joueur comme joueur principal
+        // Utiliser le premier joueur comme joueur principal mm si y a que 1 joueur pcke flemme de faire du miltijoueur
         Joueur* joueur = joueurs[0];
         
         UI::clearScreen();
@@ -110,7 +108,6 @@ int main() {
                                     int choixPokemonIndex = UI::getValidChoice(0, pokemonCount);
                                     
                                     if (choixPokemonIndex > 0) {
-                                        // Adjust for correct indexing
                                         int actualIndex = 0;
                                         int currentCount = 0;
                                         for (int i = 0; i < 6; i++) {
@@ -143,13 +140,14 @@ int main() {
                                     UI::afficherPokemons(joueur);
                                     std::cout << "\nChoisissez le premier Pokemon (1-" 
                                             << pokemonCount << "): ";
+
                                     int choixIndex1 = UI::getValidChoice(1, pokemonCount);
                                     
                                     std::cout << "Choisissez le deuxième Pokemon (1-" 
                                             << pokemonCount << "): ";
                                     int choixIndex2 = UI::getValidChoice(1, pokemonCount);
                                     
-                                    // Convert display indexes to actual array indexes
+                                    // index affichage vers index tableau
                                     int index1 = -1, index2 = -1;
                                     int currentCount = 0;
                                     
@@ -162,7 +160,7 @@ int main() {
                                     }
                                     
                                     if (index1 != -1 && index2 != -1 && index1 != index2) {
-                                        joueur->echangerPokemons(index1, index2); // Use the method from Entraineur
+                                        joueur->echangerPokemons(index1, index2); 
                                         std::cout << "Ordre des Pokemon modifié!" << std::endl;
                                     }
                                 }

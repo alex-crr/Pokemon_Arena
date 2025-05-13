@@ -206,6 +206,7 @@ int main() {
                 case 4: { // Affronter un Maitre Pokemon
                     UI::clearScreen();
                     std::cout << "\n===== MAITRES POKEMON DISPONIBLES =====" << std::endl;
+                    
                     for (size_t i = 0; i < maitres.size(); ++i) {
                         std::cout << i + 1 << ". " << maitres[i]->getNom() << std::endl;
                     }

@@ -149,12 +149,30 @@ void UI::afficherMessagesCombat(const std::vector<std::string>& messages, const 
 }
 
 Combat* UI::demarrerCombat(Joueur* joueur, Entraineur* entraineur, const std::string& titreCombat) {
+    // Créer un nouveau combat
     Combat* combat = new Combat(joueur, entraineur);
+    
+    // Lancer le combat - maintenant demarrer() gère tout l'affichage
     std::vector<std::string> messages = combat->demarrer();
     
-    afficherMessagesCombat(messages, titreCombat);
-    waitForEnter();
+    // Afficher seulement les messages finaux importants (résultat, badges)
+    std::vector<std::string> resultMessages;
+    for (const auto& msg : messages) {
+        if (msg.find("remporte le combat") != std::string::npos ||
+            msg.find("obtient un badge") != std::string::npos ||
+            msg.find("Match nul") != std::string::npos) {
+            resultMessages.push_back(msg);
+        }
+    }
     
+    if (!resultMessages.empty()) {
+        std::cout << "\n=== RÉSULTAT DU COMBAT ===" << std::endl;
+        for (const auto& msg : resultMessages) {
+            std::cout << msg << std::endl;
+        }
+    }
+    
+    waitForEnter();
     return combat;
 }
 

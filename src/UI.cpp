@@ -29,7 +29,7 @@ void UI::afficherMenuLeaders(const std::vector<Leader*>& leaders) {
     std::cout << "\n===== LEADERS DISPONIBLES =====" << std::endl;
     for (size_t i = 0; i < leaders.size(); ++i) {
         std::cout << i + 1 << ". " << leaders[i]->getNom() << " (Gymnase: "
-                 << Entraineur::getGymName(leaders[i]->getGymnase())
+                 << Leader::GymToString(leaders[i]->getGymnase())
                  << ", Badge: " << leaders[i]->getBadge() << ")" << std::endl;
     }
     std::cout << "0. Retour" << std::endl;

@@ -139,34 +139,3 @@ std::string Entraineur::interagir() const
     }
     return _nom + " : \"Bravo pour ta victoire! Continue de t'entrainer pour devenir encore plus fort!\"";
 }
-
-std::string Entraineur::getGymName(Entraineur::Gymnase gym) {
-    switch(gym) {
-        case Gymnase::ARGENTA: return "Arène d'Argenta";
-        case Gymnase::AZURIA: return "Arène d'Azuria";
-        case Gymnase::CARMIN: return "Arène de Carmin sur Mer";
-        case Gymnase::CELADOPOLE: return "Arène de Céladopole";
-        case Gymnase::PARMANIE: return "Arène de Parmanie";
-        case Gymnase::SAFRANIA: return "Arène de Safrania";
-        case Gymnase::CRAMOISILE: return "Arène de Cramois'Île";
-        case Gymnase::JADIELLE: return "Arène de Jadielle";
-        default: return "Gymnase inconnu";
-    }
-}
-
-/**
- * @brief Convertit une chaîne en enum Gymnase
- * @param gymnaseStr Chaîne représentant le gymnase
- * @return Enum Gymnase correspondant
- */
-Entraineur::Gymnase Entraineur::convertirStringEnGymnase(const std::string& gymnaseStr)
-{
-    if (gymnaseStr == "Arène d'Argenta") return Gymnase::ARGENTA;
-    if (gymnaseStr == "Arène d'Azuria") return Gymnase::AZURIA;
-    if (gymnaseStr == "Arène de Carmin-sur-Mer") return Gymnase::CARMIN;
-    if (gymnaseStr == "Arène de Céladopole") return Gymnase::CELADOPOLE;
-    if (gymnaseStr == "Arène de Parmanie") return Gymnase::PARMANIE;
-    if (gymnaseStr == "Arène de Safrania") return Gymnase::SAFRANIA;
-    if (gymnaseStr == "Arène de Cramois'Île") return Gymnase::CRAMOISILE;
-    return Gymnase::JADIELLE; // Par défaut
-}

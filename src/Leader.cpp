@@ -59,7 +59,7 @@ Leader::~Leader()
  * @brief Obtenir le gymnase associé au leader
  * @return Gymnase du leader
  */
-Entraineur::Gymnase Leader::getGymnase() const
+Leader::Gymnase Leader::getGymnase() const
 {
     return _gymnase;
 }
@@ -79,7 +79,7 @@ std::string Leader::getBadge() const
 void Leader::afficher() const
 {
     std::cout << "Leader: " << getNom() << std::endl;
-    std::cout << "Gymnase: " << Entraineur::getGymName(_gymnase) << std::endl;
+    std::cout << "Gymnase: " << GymToString(_gymnase) << std::endl;
     std::cout << "Badge: " << _badge << std::endl;
     std::cout << "Pokemon:" << std::endl;
     for (int i = 0; i < 6; i++) {
@@ -123,7 +123,7 @@ std::vector<Leader*> Leader::chargerLeaders(const std::string& nomFichier, const
         }
         
         // Créer le leader
-        Gymnase gymnase = Entraineur::convertirStringEnGymnase(gymnaseStr);
+        Gymnase gymnase = Leader::StringToGym(gymnaseStr);
         Leader* leader = new Leader(nom, gymnase, badge);
         
         // Associer les pokémons
@@ -143,4 +143,54 @@ std::vector<Leader*> Leader::chargerLeaders(const std::string& nomFichier, const
     }
     
     return leaders;
+}
+
+/**
+ * @brief Implementation of the interagir method for Leader
+ * @return Message from the Leader when interacted with
+ */
+std::string Leader::interagir() const
+{
+    if (!_estVaincu) {
+        return "Vous ne pouvez pas interagir avec " + _nom + " car vous ne l'avez pas encore vaincu.";
+    }
+    
+    return _nom + " : \"Félicitations pour ta victoire! Le Badge " + _badge + 
+           " est la preuve de ton talent. Continue de t'entraîner dans l'Arène " + 
+           GymToString(_gymnase) + "!\"";
+}
+
+/**
+ * Converts a Gymnase enum value to its string representation
+ * @param gym The Gymnase enum value
+ * @return The full display name of the gym
+ */
+std::string Leader::GymToString(Gymnase gym) {
+    switch(gym) {
+        case Gymnase::ARGENTA: return "Arène d'Argenta";
+        case Gymnase::AZURIA: return "Arène d'Azuria";
+        case Gymnase::CARMIN: return "Arène de Carmin sur Mer";
+        case Gymnase::CELADOPOLE: return "Arène de Céladopole";
+        case Gymnase::PARMANIE: return "Arène de Parmanie";
+        case Gymnase::SAFRANIA: return "Arène de Safrania";
+        case Gymnase::CRAMOISILE: return "Arène de Cramois'Île";
+        case Gymnase::JADIELLE: return "Arène de Jadielle";
+        default: return "Gymnase inconnu";
+    }
+}
+
+/**
+ * Converts a string to a Gymnase enum value
+ * @param gymnaseStr String representing the gymnasium
+ * @return Corresponding Gymnase enum value
+ */
+Leader::Gymnase Leader::StringToGym(const std::string& gymnaseStr) {
+    if (gymnaseStr == "Arène d'Argenta") return Gymnase::ARGENTA;
+    if (gymnaseStr == "Arène d'Azuria") return Gymnase::AZURIA;
+    if (gymnaseStr == "Arène de Carmin-sur-Mer") return Gymnase::CARMIN;
+    if (gymnaseStr == "Arène de Céladopole") return Gymnase::CELADOPOLE;
+    if (gymnaseStr == "Arène de Parmanie") return Gymnase::PARMANIE;
+    if (gymnaseStr == "Arène de Safrania") return Gymnase::SAFRANIA;
+    if (gymnaseStr == "Arène de Cramois'Île") return Gymnase::CRAMOISILE;
+    return Gymnase::JADIELLE; // Par défaut
 }

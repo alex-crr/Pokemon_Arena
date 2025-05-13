@@ -202,8 +202,6 @@ double Pokemon::calculerMultiplicateurType(Type typeAttaque) const
         initTypeEffectiveness();
     }
     
-    double totalMulti = 1.0;
-    
     double maxMultiplier = 0.0; // Initialize à 0 pour sortir le max
     for (const auto& type : _types) {
         double currentMultiplier = getMultiplicateur(type, typeAttaque);

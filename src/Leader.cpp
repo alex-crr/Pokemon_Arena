@@ -134,7 +134,9 @@ std::vector<Leader*> Leader::chargerLeaders(const std::string& nomFichier, const
                     [&nomPokemons, i](Pokemon* p) { return p->getNom() == nomPokemons[i]; });
                 
                 if (it != pokemons.end()) {
-                    leader->setPokemon(i, *it);
+                    // Create a copy of the Pokemon instead of using the original
+                    Pokemon* pokemonCopy = new Pokemon(**it);
+                    leader->setPokemon(i, pokemonCopy);
                 }
             }
         }

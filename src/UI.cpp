@@ -26,6 +26,13 @@ void UI::afficherMenu() {
 
 void UI::afficherMenuLeaders(const std::vector<Leader*>& leaders) {
     clearScreen();
+    
+    if (leaders.empty()) {
+        std::cout << "\n===== LEADERS DISPONIBLES =====" << std::endl;
+        std::cout << "Aucun Leader disponible pour le moment." << std::endl;
+        return;
+    }
+    
     std::cout << "\n===== LEADERS DISPONIBLES =====" << std::endl;
     for (size_t i = 0; i < leaders.size(); ++i) {
         std::cout << i + 1 << ". " << leaders[i]->getNom() << " (Gymnase: "

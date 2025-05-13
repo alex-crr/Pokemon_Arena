@@ -29,6 +29,8 @@ int main() {
         }
         UI::clearScreen();
         
+        UI::clearScreen();
+        
         // Initialiser le générateur de nombres aléatoires
         std::srand(static_cast<unsigned int>(std::time(nullptr)));
         
@@ -47,6 +49,8 @@ int main() {
         
         // Utiliser le premier joueur comme joueur principal
         Joueur* joueur = joueurs[0];
+        
+        UI::clearScreen();
         
         std::cout << "Bienvenue dans Pokemon Arena!" << std::endl;
         std::cout << "Vous jouez avec " << joueur->getNom() << "." << std::endl;
@@ -186,17 +190,35 @@ int main() {
                 case 3: { // Affronter un Leader de Gymnase
                     bool menuLeaders = true;
                     while (menuLeaders) {
-                        UI::afficherMenuLeaders(leaders);
-                        int choixLeader = UI::getValidChoice(0, leaders.size());
+                        // Filter out defeated leaders
+                        std::vector<Leader*> availableLeaders;
+                        for (auto leader : leaders) {
+                            if (!leader->getEstVaincu()) {
+                                availableLeaders.push_back(leader);
+                            }
+                        }
                         
-                        if (choixLeader == 0) {
+                        // Check if there are any undefeated leaders
+                        if (availableLeaders.empty()) {
+                            UI::clearScreen();
+                            std::cout << "\n===== LEADERS DE GYMNASE =====" << std::endl;
+                            std::cout << "Vous avez déjà vaincu tous les Leaders de Gymnase!" << std::endl;
+                            UI::waitForEnter();
                             menuLeaders = false;
                         } else {
-                            Leader* selectedLeader = leaders[choixLeader - 1];
-                            Combat* combat = UI::demarrerCombat(joueur, selectedLeader);
-                            delete combat;
-                            UI::waitForEnter();
-                            menuLeaders = false; // Retour au menu principal après un combat
+                            // Show menu with available leaders only
+                            UI::afficherMenuLeaders(availableLeaders);
+                            int choixLeader = UI::getValidChoice(0, availableLeaders.size());
+                            
+                            if (choixLeader == 0) {
+                                menuLeaders = false;
+                            } else {
+                                Leader* selectedLeader = availableLeaders[choixLeader - 1];
+                                Combat* combat = UI::demarrerCombat(joueur, selectedLeader);
+                                delete combat;
+                                UI::waitForEnter();
+                                menuLeaders = false; // Return to main menu after a battle
+                            }
                         }
                     }
                     break;

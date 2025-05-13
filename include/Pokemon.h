@@ -52,7 +52,11 @@ protected:
     int _degatsAttaque;        
 
 public:
+    // Regular constructor
     Pokemon(const std::string& nom, const std::vector<Type>& types, int hp, const std::string& nomAttaque, int degatsAttaque);
+    
+    // Copy constructor
+    Pokemon(const Pokemon& other);
     
     virtual ~Pokemon() = default;
     

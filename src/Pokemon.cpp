@@ -129,6 +129,21 @@ Pokemon::Pokemon(const std::string& nom, const std::vector<Type>& types, int hp,
     // liste d'initialisation vue avant pour permettre le const. problème?
 }
 
+/**
+ * @brief Copy constructor for Pokemon
+ * @param other The Pokemon to copy
+ */
+Pokemon::Pokemon(const Pokemon& other)
+    : _nom(other._nom), 
+      _types(other._types), 
+      _hp(other._hp), 
+      _maxHp(other._maxHp), 
+      _nomAttaque(other._nomAttaque), 
+      _degatsAttaque(other._degatsAttaque)
+{
+    // All member variables are copied in the initializer list
+}
+
 // Getters
 std::string Pokemon::getNom() const 
 {

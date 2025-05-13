@@ -3,6 +3,7 @@
 #include <chrono>
 #include <thread>
 #include <sstream>
+#include <iomanip>
 
 Combat::Combat(Entraineur* entraineur1, Entraineur* entraineur2)
     : _entraineur1(entraineur1), _entraineur2(entraineur2), _indexPokemon1(0), _indexPokemon2(0), _combatTermine(false)
@@ -207,26 +208,99 @@ std::string Combat::getEtatCombat() const
 
 std::string Combat::interagir() const
 {
-    // L'interaction avec un combat permet de revoir les derniers messages
-    std::stringstream ss;
-    ss << "Résumé du dernier combat entre " << _entraineur1->getNom() 
-       << " et " << _entraineur2->getNom() << ":\n";
-    
-    if (_messages.empty()) {
-        ss << "Pas d'informations disponibles sur ce combat.";
-    } else {
-        // Afficher les 5 derniers messages ou moins s'il y en a moins
-        size_t start = _messages.size() > 5 ? _messages.size() - 5 : 0;
-        for (size_t i = start; i < _messages.size(); ++i) {
-            ss << "- " << _messages[i] << "\n";
-        }
-    }
-    
-    return ss.str();
+    throw std::logic_error("La méthode interagir() n'est pas implémentée.");
 }
 
 void Combat::afficher() const
 {
-    std::cout << interagir() << std::endl;
+    const int width = 78;
+    
+    // Get current active Pokemon
+    Pokemon* pokemon1 = _entraineur1->getPokemon(_indexPokemon1);
+    Pokemon* pokemon2 = _entraineur2->getPokemon(_indexPokemon2);
+    
+    if (!pokemon1 || !pokemon2) {
+        std::cout << "Combat non initialisé ou terminé." << std::endl;
+        return;
+    }
+    
+    // Header with trainer info and active Pokemon
+    std::cout << "+" << std::string(width, '-') << "+" << std::endl;
+    
+    std::string trainer1Info = "Trainer: " + _entraineur1->getNom();
+    std::string trainer2Info = "Trainer: " + _entraineur2->getNom();
+    std::cout << "| " << std::left << std::setw(40) << trainer1Info 
+              << std::left << std::setw(36) << trainer2Info << " |" << std::endl;
+              
+    std::stringstream pokemon1Info;
+    pokemon1Info << "Active: " << std::left << std::setw(10) << pokemon1->getNom() 
+                << " (HP: " << pokemon1->getHp() << "/" << pokemon1->getMaxHp() << ")";
+    
+    std::stringstream pokemon2Info;
+    pokemon2Info << std::left << std::setw(15) << pokemon2->getNom()
+                << " (HP: " << pokemon2->getHp() << "/" << pokemon2->getMaxHp() << ")";
+    
+    std::cout << "| " << std::left << std::setw(40) << pokemon1Info.str()
+              << std::left << std::setw(36) << pokemon2Info.str() << " |" << std::endl;
+    
+    std::cout << "| " << std::string(width-2, ' ') << " |" << std::endl;
+    
+    // Trainer 1's team
+    std::cout << "| " << _entraineur1->getNom() << "'s Team:" << std::string(width - 15 - _entraineur1->getNom().length(), ' ') << " |" << std::endl;
+    
+    // Display Pokemon in two rows of 3
+    for (int i = 0; i < 6; i += 3) {
+        std::stringstream teamRow;
+        for (int j = i; j < i+3 && j < 6; ++j) {
+            Pokemon* p = _entraineur1->getPokemon(j);
+            if (p) {
+                teamRow << "  [" << j+1 << "] " << std::left << std::setw(10) << p->getNom();
+                if (p->getHp() <= 0) teamRow << " (KO)";
+                teamRow << "  ";
+            }
+        }
+        std::cout << "| " << std::left << std::setw(width-2) << teamRow.str() << " |" << std::endl;
+    }
+    
+    std::cout << "| " << std::string(width-2, ' ') << " |" << std::endl;
+    
+    // Trainer 2's team
+    std::cout << "| " << _entraineur2->getNom() << "'s Team:" << std::string(width - 15 - _entraineur2->getNom().length(), ' ') << " |" << std::endl;
+    
+    for (int i = 0; i < 6; i += 3) {
+        std::stringstream teamRow;
+        for (int j = i; j < i+3 && j < 6; ++j) {
+            Pokemon* p = _entraineur2->getPokemon(j);
+            if (p) {
+                teamRow << "  [" << j+1 << "] " << std::left << std::setw(10) << p->getNom();
+                if (p->getHp() <= 0) teamRow << " (KO)";
+                teamRow << "  ";
+            }
+        }
+        std::cout << "| " << std::left << std::setw(width-2) << teamRow.str() << " |" << std::endl;
+    }
+    
+    std::cout << "| " << std::string(width-2, ' ') << " |" << std::endl;
+    std::cout << "+" << std::string(width, '-') << "+" << std::endl;
+    
+    // Display last few combat messages
+    if (!_messages.empty()) {
+        std::cout << "| " << std::left << std::setw(width-2) << "Last combat actions:" << " |" << std::endl;
+        
+        // Display the last 3 messages or fewer if not available
+        size_t start = _messages.size() > 3 ? _messages.size() - 3 : 0;
+        for (size_t i = start; i < _messages.size(); ++i) {
+            // Split long messages if needed
+            std::string msg = _messages[i];
+            while (msg.length() > width-4) {
+                std::string part = msg.substr(0, width-4);
+                std::cout << "| " << part << " |" << std::endl;
+                msg = msg.substr(width-4);
+            }
+            std::cout << "| " << std::left << std::setw(width-2) << msg << " |" << std::endl;
+        }
+    }
+    
+    std::cout << "+" << std::string(width, '-') << "+" << std::endl;
 }
 

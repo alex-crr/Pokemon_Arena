@@ -28,10 +28,7 @@ std::vector<std::string> Combat::demarrer()
         return _messages;
     }
 
-    // Premier affichage de l'état du combat
-    _messages.push_back(getEtatCombat());
-    
-    // Afficher l'état initial du combat
+    // Afficher l'état initial du combat sans message d'état du combat
     afficher();
     std::cout << "\nAppuyez sur Entrée pour commencer le combat...";
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -39,11 +36,14 @@ std::vector<std::string> Combat::demarrer()
     // Boucle de combat
     while (!estTermine()) {
         auto tourMessages = effectuerTour();
-        _messages.insert(_messages.end(), tourMessages.begin(), tourMessages.end());
         
-        // Pause entre les tours pour que le joueur puisse suivre
-        std::cout << "\nAppuyez sur Entrée pour continuer...";
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        // Pause à la fin du tour complet pour que le joueur puisse suivre
+        if (!estTermine()) {
+            afficher();
+            std::cout << "\n=== Fin du tour ===";
+            std::cout << "\nAppuyez sur Entrée pour le prochain tour...";
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
     }
 
     // Annoncer le vainqueur
@@ -97,27 +97,47 @@ std::vector<std::string> Combat::effectuerTour()
         return tourMessages;
     }
 
-    // Le joueur attaque en premier
-    tourMessages.push_back(pokemon1->getNom() + " de " + _entraineur1->getNom() + 
-                          " utilise " + pokemon1->getNomAttaque() + "!");
-    _messages.push_back(pokemon1->getNom() + " de " + _entraineur1->getNom() + 
-                       " utilise " + pokemon1->getNomAttaque() + "!");
+    // Le joueur (entraineur 1) attaque en premier
+    std::string attackMessage = pokemon1->getNom() + " de " + _entraineur1->getNom() + 
+                          " utilise " + pokemon1->getNomAttaque() + "!";
+    tourMessages.push_back(attackMessage);
     
-    // Attaque du Pokemon 1
+    // Remplacer le dernier message du log au lieu d'ajouter continuellement
+    if (!_messages.empty()) {
+        _messages.push_back(attackMessage);
+        
+        // Limiter le nombre de messages dans le journal pour éviter l'accumulation
+        if (_messages.size() > 10) {
+            _messages.erase(_messages.begin(), _messages.begin() + (_messages.size() - 10));
+        }
+    } else {
+        _messages.push_back(attackMessage);
+    }
+    
+    // Afficher l'intention d'attaque et attendre la confirmation
+    afficher();
+    std::cout << "\nAppuyez sur Entrée pour effectuer l'attaque...";
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    
+    // Exécuter l'attaque du Pokemon 1
     int degats = pokemon1->attaquer(*pokemon2);
-    tourMessages.push_back(pokemon2->getNom() + " perd " + std::to_string(degats) + " PV!");
-    _messages.push_back(pokemon2->getNom() + " perd " + std::to_string(degats) + " PV!");
+    std::string damageMessage = pokemon2->getNom() + " perd " + std::to_string(degats) + " PV!";
+    tourMessages.push_back(damageMessage);
+    _messages.push_back(damageMessage);
     
-    // Afficher l'état après l'attaque du joueur
+    // Afficher le résultat de l'attaque
     afficher();
     
     // Vérifier si pokemon2 est KO
     if (pokemon2->getHp() <= 0) {
-        tourMessages.push_back(pokemon2->getNom() + " de " + _entraineur2->getNom() + " est KO!");
-        _messages.push_back(pokemon2->getNom() + " de " + _entraineur2->getNom() + " est KO!");
+        std::string koMessage = pokemon2->getNom() + " de " + _entraineur2->getNom() + " est KO!";
+        tourMessages.push_back(koMessage);
+        _messages.push_back(koMessage);
         
         // Afficher l'état après le KO
         afficher();
+        std::cout << "\nAppuyez sur Entrée pour continuer...";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         
         // Trouver le prochain Pokemon disponible
         _indexPokemon2 = trouverPokemonDisponible(_entraineur2, _indexPokemon2 + 1);
@@ -127,25 +147,36 @@ std::vector<std::string> Combat::effectuerTour()
             _combatTermine = true;
             return tourMessages;
         } else {
-            tourMessages.push_back(_entraineur2->getNom() + " envoie " + 
-                                  _entraineur2->getPokemon(_indexPokemon2)->getNom() + "!");
-            _messages.push_back(_entraineur2->getNom() + " envoie " + 
-                               _entraineur2->getPokemon(_indexPokemon2)->getNom() + "!");
+            std::string newPokemonMessage = _entraineur2->getNom() + " envoie " + 
+                                  _entraineur2->getPokemon(_indexPokemon2)->getNom() + "!";
+            tourMessages.push_back(newPokemonMessage);
+            _messages.push_back(newPokemonMessage);
             
             // Afficher l'état après le changement de Pokemon
             afficher();
+            std::cout << "\nAppuyez sur Entrée pour continuer...";
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
+    } else {
+        // Si le Pokemon 2 n'est pas KO, attendre confirmation pour continuer
+        std::cout << "\nAppuyez sur Entrée pour continuer...";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
     
-    // Si le combat n'est pas terminé, l'adversaire attaque
+    // Si le combat n'est pas terminé, l'adversaire (entraineur 2) attaque
     if (!_combatTermine) {
         // Récupérer le nouveau Pokemon si nécessaire
         pokemon2 = _entraineur2->getPokemon(_indexPokemon2); 
         
-        tourMessages.push_back(pokemon2->getNom() + " de " + _entraineur2->getNom() + 
-                              " utilise " + pokemon2->getNomAttaque() + "!");
-        _messages.push_back(pokemon2->getNom() + " de " + _entraineur2->getNom() + 
-                           " utilise " + pokemon2->getNomAttaque() + "!");
+        std::string attackMessage2 = pokemon2->getNom() + " de " + _entraineur2->getNom() + 
+                              " utilise " + pokemon2->getNomAttaque() + "!";
+        tourMessages.push_back(attackMessage2);
+        _messages.push_back(attackMessage2);
+        
+        // Afficher l'intention d'attaque de l'adversaire et attendre la confirmation
+        afficher();
+        std::cout << "\nAppuyez sur Entrée pour voir l'attaque adverse...";
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         
         // Si l'entraineur 2 est un Maitre, utiliser son bonus
         Maitre* maitre = dynamic_cast<Maitre*>(_entraineur2);
@@ -153,25 +184,33 @@ std::vector<std::string> Combat::effectuerTour()
         
         if (maitre) {
             degats = maitre->attaquerAvecBonus(*pokemon2, *pokemon1);
-            tourMessages.push_back("Bonus de Maitre Pokemon applique!");
-            _messages.push_back("Bonus de Maitre Pokemon applique!");
+            std::string bonusMessage = "Bonus de Maitre Pokemon appliqué!";
+            tourMessages.push_back(bonusMessage);
+            _messages.push_back(bonusMessage);
+            afficher();
+            std::cout << "\nAppuyez sur Entrée pour continuer...";
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         } else {
             degats = pokemon2->attaquer(*pokemon1);
         }
         
-        tourMessages.push_back(pokemon1->getNom() + " perd " + std::to_string(degats) + " PV!");
-        _messages.push_back(pokemon1->getNom() + " perd " + std::to_string(degats) + " PV!");
+        std::string damageMessage2 = pokemon1->getNom() + " perd " + std::to_string(degats) + " PV!";
+        tourMessages.push_back(damageMessage2);
+        _messages.push_back(damageMessage2);
         
-        // Afficher l'état après l'attaque de l'adversaire
+        // Afficher le résultat de l'attaque de l'adversaire
         afficher();
         
         // Vérifier si pokemon1 est KO
         if (pokemon1->getHp() <= 0) {
-            tourMessages.push_back(pokemon1->getNom() + " de " + _entraineur1->getNom() + " est KO!");
-            _messages.push_back(pokemon1->getNom() + " de " + _entraineur1->getNom() + " est KO!");
+            std::string koMessage = pokemon1->getNom() + " de " + _entraineur1->getNom() + " est KO!";
+            tourMessages.push_back(koMessage);
+            _messages.push_back(koMessage);
             
             // Afficher l'état après le KO
             afficher();
+            std::cout << "\nAppuyez sur Entrée pour continuer...";
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             
             // Trouver le prochain Pokemon disponible
             _indexPokemon1 = trouverPokemonDisponible(_entraineur1, _indexPokemon1 + 1);
@@ -181,14 +220,20 @@ std::vector<std::string> Combat::effectuerTour()
                 _combatTermine = true;
                 return tourMessages;
             } else {
-                tourMessages.push_back(_entraineur1->getNom() + " envoie " + 
-                                      _entraineur1->getPokemon(_indexPokemon1)->getNom() + "!");
-                _messages.push_back(_entraineur1->getNom() + " envoie " + 
-                                   _entraineur1->getPokemon(_indexPokemon1)->getNom() + "!");
+                std::string newPokemonMessage = _entraineur1->getNom() + " envoie " + 
+                                      _entraineur1->getPokemon(_indexPokemon1)->getNom() + "!";
+                tourMessages.push_back(newPokemonMessage);
+                _messages.push_back(newPokemonMessage);
                 
                 // Afficher l'état après le changement de Pokemon
                 afficher();
+                std::cout << "\nAppuyez sur Entrée pour continuer...";
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             }
+        } else {
+            // Si le Pokemon 1 n'est pas KO, attendre confirmation pour continuer
+            std::cout << "\nAppuyez sur Entrée pour continuer...";
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     }
     
@@ -228,6 +273,7 @@ int Combat::trouverPokemonDisponible(const Entraineur* entraineur, int indexCour
 
 std::string Combat::getEtatCombat() const
 {
+    // Keep the method for backward compatibility, but we don't use it anymore
     Pokemon* pokemon1 = _entraineur1->getPokemon(_indexPokemon1);
     Pokemon* pokemon2 = _entraineur2->getPokemon(_indexPokemon2);
     
@@ -372,23 +418,33 @@ void Combat::afficher() const
     std::cout << "| " << std::left << std::setw(width-2) << "JOURNAL DE COMBAT" << " |" << std::endl;
     std::cout << "+" << std::string(width, '-') << "+" << std::endl;
     
-    // Display the last 5 messages or fewer if not available
+    // Display only the most recent messages (up to 5)
     size_t messageCount = _messages.size();
     size_t start = (messageCount > 5) ? messageCount - 5 : 0;
+    size_t displayedCount = 0;
     
     for (size_t i = start; i < messageCount; ++i) {
+        // Skip empty messages
+        if (_messages[i].empty()) continue;
+        
+        // Skip état du combat messages
+        if (_messages[i].find("Etat du combat") != std::string::npos) continue;
+        
         // Split long messages if needed
         std::string msg = _messages[i];
         while (msg.length() > width-4) {
             std::string part = msg.substr(0, width-4);
             std::cout << "| " << part << " |" << std::endl;
             msg = msg.substr(width-4);
+            displayedCount++;
         }
+        
         std::cout << "| " << std::left << std::setw(width-2) << msg << " |" << std::endl;
+        displayedCount++;
     }
     
-    // Fill remaining lines if fewer than 5 messages
-    for (size_t i = 0; i < 5 - std::min(messageCount, size_t(5)) + start; ++i) {
+    // Fill remaining lines to ensure consistent display
+    for (size_t i = displayedCount; i < 5; ++i) {
         std::cout << "| " << std::string(width-2, ' ') << " |" << std::endl;
     }
     

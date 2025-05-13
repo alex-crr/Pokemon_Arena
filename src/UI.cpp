@@ -149,26 +149,36 @@ void UI::afficherMessagesCombat(const std::vector<std::string>& messages, const 
 }
 
 Combat* UI::demarrerCombat(Joueur* joueur, Entraineur* entraineur, const std::string& titreCombat) {
-    // Créer un nouveau combat
     Combat* combat = new Combat(joueur, entraineur);
-    
-    // Lancer le combat - maintenant demarrer() gère tout l'affichage
     std::vector<std::string> messages = combat->demarrer();
     
-    // Afficher seulement les messages finaux importants (résultat, badges)
-    std::vector<std::string> resultMessages;
-    for (const auto& msg : messages) {
-        if (msg.find("remporte le combat") != std::string::npos ||
-            msg.find("obtient un badge") != std::string::npos ||
-            msg.find("Match nul") != std::string::npos) {
-            resultMessages.push_back(msg);
-        }
-    }
+    // Au lieu d'afficher les messages textuels, utiliser la nouvelle interface visuelle
+    // pour afficher le résultat final du combat
+    combat->afficher();
     
-    if (!resultMessages.empty()) {
-        std::cout << "\n=== RÉSULTAT DU COMBAT ===" << std::endl;
-        for (const auto& msg : resultMessages) {
-            std::cout << msg << std::endl;
+    // Pour les messages de fin spécifiques (victoire, défaite, badge)
+    size_t messageCount = messages.size();
+    if (messageCount > 0) {
+        std::vector<std::string> finalMessages;
+        
+        // Trouver les 3 derniers messages (généralement victoire/défaite et conséquences)
+        size_t start = messageCount > 3 ? messageCount - 3 : 0;
+        for (size_t i = start; i < messageCount; i++) {
+            if (messages[i].find("remporte") != std::string::npos || 
+                messages[i].find("badge") != std::string::npos ||
+                messages[i].find("Match nul") != std::string::npos ||
+                messages[i].find("FIN DU COMBAT") != std::string::npos) {
+                finalMessages.push_back(messages[i]);
+            }
+        }
+        
+        // Afficher les messages finaux
+        if (!finalMessages.empty()) {
+            std::cout << "\n=== RÉSULTAT DU COMBAT ===" << std::endl;
+            for (const auto& msg : finalMessages) {
+                if (msg != "=== FIN DU COMBAT ===")
+                    std::cout << msg << std::endl;
+            }
         }
     }
     

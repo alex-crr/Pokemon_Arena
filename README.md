@@ -16,9 +16,6 @@ Un simulateur de combat Pokémon en C++ développé dans le cadre du cours de Pr
 - `include/` - Fichiers d'en-tête (.h)
 - `src/` - Fichiers source (.cpp)
 - `data/` - Fichiers de données (.csv)
-- `tests/` - Tests unitaires
-- `docs/` - Documentation technique
-- `tools/` - Outils utilitaires
 
 ## Compilation et exécution
 
@@ -46,15 +43,7 @@ make run-tests
 ```
 
 ## Diagramme UML
-
-Vous pouvez générer le diagramme UML du projet avec l'outil fourni :
-
-```bash
-cd tools
-python GenerateUML.py
-```
-
-Le diagramme UML sera généré au format PlantUML dans le dossier `docs/`.
+Le diagramme UML a été généré via PlantUML, le code source étant fourni.
 
 ## Concepts de POO utilisés
 

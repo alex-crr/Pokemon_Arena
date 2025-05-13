@@ -139,3 +139,44 @@ std::string Entraineur::interagir() const
     }
     return _nom + " : \"Bravo pour ta victoire! Continue de t'entrainer pour devenir encore plus fort!\"";
 }
+
+/**
+ * @brief Soigne tous les Pokémon de l'entraineur
+ */
+void Entraineur::soignerPokemons()
+{
+    for (int i = 0; i < 6; i++) {
+        if (_pokemons[i] != nullptr) {
+            _pokemons[i]->soigner();
+        }
+    }
+}
+
+/**
+ * @brief Échange la position de deux Pokémon dans l'équipe
+ * @param index1 Position du premier Pokémon
+ * @param index2 Position du deuxième Pokémon
+ */
+void Entraineur::echangerPokemons(int index1, int index2)
+{
+    if (index1 >= 0 && index1 < 6 && index2 >= 0 && index2 < 6) {
+        Pokemon* temp = _pokemons[index1];
+        _pokemons[index1] = _pokemons[index2];
+        _pokemons[index2] = temp;
+    }
+}
+
+/**
+ * @brief Compte le nombre de Pokémon non-nuls dans l'équipe
+ * @return Nombre de Pokémon
+ */
+int Entraineur::countPokemons() const
+{
+    int count = 0;
+    for (int i = 0; i < 6; i++) {
+        if (_pokemons[i] != nullptr) {
+            count++;
+        }
+    }
+    return count;
+}

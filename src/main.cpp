@@ -90,7 +90,7 @@ int main() {
                             case 2: { // Soigner mes Pokemon
                                 UI::clearScreen();
                                 std::cout << "\n===== SOIGNER MES POKEMON =====" << std::endl;
-                                UI::soignerPokemons(joueur);
+                                joueur->soignerPokemons(); // Use the method from Entraineur
                                 std::cout << "Tous vos Pokemon ont été soignés!" << std::endl;
                                 UI::waitForEnter();
                                 break;
@@ -99,7 +99,7 @@ int main() {
                             case 3: { // Interagir avec mes Pokemon
                                 UI::clearScreen();
                                 std::cout << "\n===== INTERAGIR AVEC MES POKEMON =====" << std::endl;
-                                int pokemonCount = UI::countPokemons(joueur);
+                                int pokemonCount = joueur->countPokemons(); // Use Entraineur's method
                                 if (pokemonCount == 0) {
                                     std::cout << "Vous n'avez pas de Pokemon!" << std::endl;
                                 } else {
@@ -136,7 +136,7 @@ int main() {
                             case 4: { // Changer l'ordre des Pokemon
                                 UI::clearScreen();
                                 std::cout << "\n===== CHANGER L'ORDRE DE MES POKEMON =====" << std::endl;
-                                int pokemonCount = UI::countPokemons(joueur);
+                                int pokemonCount = joueur->countPokemons();
                                 if (pokemonCount < 2) {
                                     std::cout << "Vous n'avez pas assez de Pokemon pour changer leur ordre!" << std::endl;
                                 } else {
@@ -162,7 +162,7 @@ int main() {
                                     }
                                     
                                     if (index1 != -1 && index2 != -1 && index1 != index2) {
-                                        UI::echangerPokemons(joueur, index1, index2);
+                                        joueur->echangerPokemons(index1, index2); // Use the method from Entraineur
                                         std::cout << "Ordre des Pokemon modifié!" << std::endl;
                                     }
                                 }
@@ -214,7 +214,11 @@ int main() {
                                 menuLeaders = false;
                             } else {
                                 Leader* selectedLeader = availableLeaders[choixLeader - 1];
-                                Combat* combat = UI::demarrerCombat(joueur, selectedLeader);
+                                // Create and manage the combat directly without UI::demarrerCombat
+                                Combat* combat = new Combat(joueur, selectedLeader);
+                                combat->demarrer();
+                                combat->afficher(); // This shows the final state
+                                
                                 delete combat;
                                 UI::waitForEnter();
                                 menuLeaders = false; // Return to main menu after a battle
@@ -236,7 +240,11 @@ int main() {
                     int choixMaitre = UI::getValidChoice(0, maitres.size());
                     if (choixMaitre > 0) {
                         Maitre* selectedMaitre = maitres[choixMaitre - 1];
-                        Combat* combat = UI::demarrerCombat(joueur, selectedMaitre);
+                        // Create and manage the combat directly
+                        Combat* combat = new Combat(joueur, selectedMaitre);
+                        combat->demarrer();
+                        combat->afficher();
+                        
                         delete combat;
                     }
                     UI::waitForEnter();

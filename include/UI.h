@@ -20,13 +20,6 @@ public:
     static int getValidChoice(int min, int max);
     static void waitForEnter();
     
-    // Combat-related functions
-    static void afficherMessagesCombat(const std::vector<std::string>& messages, const std::string& titreEntete);
-    static Combat* demarrerCombat(Joueur* joueur, Entraineur* entraineur);
-    
-    // Pokemon-related functions
+    // Pokemon-display functions
     static void afficherPokemons(const Entraineur* entraineur);
-    static void soignerPokemons(Entraineur* entraineur);
-    static void echangerPokemons(Entraineur* entraineur, int index1, int index2);
-    static int countPokemons(const Entraineur* entraineur);
 };

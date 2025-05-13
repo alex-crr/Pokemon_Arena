@@ -34,4 +34,9 @@ public:
     
     // Implementation de l'interface Interagir
     virtual std::string interagir() const override;
+    
+    // Pokemon management methods
+    void soignerPokemons();
+    void echangerPokemons(int index1, int index2);
+    int countPokemons() const; // Added count method
 };

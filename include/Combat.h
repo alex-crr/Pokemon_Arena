@@ -40,4 +40,6 @@ public:
     
     // Implementation de l'interface Interagir
     virtual std::string interagir() const override;
+
+    virtual void afficher() const override;
 };

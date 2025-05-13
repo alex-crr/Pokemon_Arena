@@ -231,8 +231,7 @@ int Pokemon::recevoirAttaque(int degats, Type typeAttaque)
  */
 void Pokemon::afficher() const
 {
-    std::cout << "Nom: " << _nom << std::endl;
-    std::cout << "hp: " << _hp << "/" << _maxHp << std::endl;
+    std::cout << getDetailedInfo() << std::endl;
 }
 
 /**
@@ -275,12 +274,12 @@ std::vector<Pokemon*> Pokemon::chargerPokemons(const std::string &nomFichier)
         std::getline(ss, degatsAttaqueStr, ',');
         
         // Convertir les types en enum
-        Type type1 = convertirStringEnType(type1Str);
+        Type type1 = stringToType(type1Str);
         std::vector<Type> types = {type1};
         
         // Ajouter le second type si présent
         if (!type2Str.empty()) {
-            Type type2 = convertirStringEnType(type2Str);
+            Type type2 = stringToType(type2Str);
             types.push_back(type2);
         }
         
@@ -301,7 +300,7 @@ std::vector<Pokemon*> Pokemon::chargerPokemons(const std::string &nomFichier)
  * @param typeStr Chaîne représentant le type
  * @return Enum Type correspondant
  */
-Type Pokemon::convertirStringEnType(const std::string& typeStr)
+Type Pokemon::stringToType(const std::string& typeStr)
 {
     if (typeStr == "Feu") return Type::FEU;
     if (typeStr == "Eau") return Type::EAU;

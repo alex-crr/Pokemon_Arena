@@ -13,4 +13,5 @@ public:
      * @return Message resultant de l'interaction
      */
     virtual std::string interagir() const = 0;
+    virtual void afficher() const = 0;
 };

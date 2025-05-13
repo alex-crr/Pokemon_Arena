@@ -225,3 +225,8 @@ std::string Combat::interagir() const
     return ss.str();
 }
 
+void Combat::afficher() const
+{
+    std::cout << interagir() << std::endl;
+}
+

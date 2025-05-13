@@ -72,22 +72,23 @@ public:
     
     int recevoirAttaque(int degats, Type typeAttaque);
     
-    void afficher() const;
-    
     std::string getDetailedInfo() const;
     
     std::string ToString();
     
     static std::vector<Pokemon*> chargerPokemons(const std::string& nomFichier);
     
-    static Type convertirStringEnType(const std::string& typeStr);
+    static Type stringToType(const std::string& typeStr);
     
     static std::string typeToString(Type type);
-    
-    virtual std::string interagir() const override;
     
     static double getMultiplicateur(Type typeDefense, Type typeAttaque);
     
     static std::vector<Type> getWeaknesses(Type type);
     static std::vector<Type> getResistances(Type type);
+
+
+    // Interagir
+    virtual std::string interagir() const override;
+    virtual void afficher() const;
 };

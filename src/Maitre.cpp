@@ -38,10 +38,17 @@ Maitre::~Maitre()
  */
 int Maitre::attaquerAvecBonus(Pokemon& pokemonAllie, Pokemon& cible) const
 {
-    int degatsBase = pokemonAllie.attaquer(cible);
-    // Les dégâts ont déjà été appliqués par la méthode attaquer
-    // Retournons juste le montant des dégâts avec le bonus pour information
-    return static_cast<int>(degatsBase * BONUS_DEGATS);
+    // Get attack type and damage
+    Type attackType = pokemonAllie.getTypes()[0];
+    int baseDamage = pokemonAllie.getDegatsAttaque();
+    
+    // Apply Master bonus to base damage (25% increase)
+    int bonusDamage = static_cast<int>(baseDamage * BONUS_DEGATS);
+    
+    // Apply the boosted damage directly to the target
+    int actualDamage = cible.recevoirAttaque(bonusDamage, attackType);
+    
+    return actualDamage;
 }
 
 /**

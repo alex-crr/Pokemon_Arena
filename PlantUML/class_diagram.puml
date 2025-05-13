@@ -1,5 +1,12 @@
 @startuml Pokemon Arena - Class Diagram
 
+' Use better layout
+skinparam linetype ortho
+skinparam groupInheritance 2
+skinparam padding 2
+skinparam nodesep 80
+skinparam ranksep 100
+
 ' Interface and base class
 interface Interagir {
   +{abstract} ~Interagir() : void
@@ -26,6 +33,17 @@ enum Type {
   ACIER
   FEE
   NORMAL
+}
+
+enum "Leader::Gymnase" as Gymnase {
+  ARGENTA
+  AZURIA
+  CARMIN
+  CELADOPOLE
+  PARMANIE
+  SAFRANIA
+  CRAMOISILE
+  JADIELLE
 }
 
 ' Main classes
@@ -109,17 +127,6 @@ class Joueur {
   +afficher() : void
 }
 
-enum Gymnase {
-  ARGENTA
-  AZURIA
-  CARMIN
-  CELADOPOLE
-  PARMANIE
-  SAFRANIA
-  CRAMOISILE
-  JADIELLE
-}
-
 class Leader {
   -_gymnase : Gymnase
   -_badge : string
@@ -169,33 +176,41 @@ class Combat {
 }
 
 class UI {
-  +static clearScreen() : void
-  +static afficherMenu() : void
-  +static afficherMenuLeaders(leaders : vector<Leader*>&) : void
-  +static afficherMenuPokemon() : void
-  +static getValidChoice(min : int, max : int) : int
-  +static waitForEnter() : void
-  +static afficherPokemons(entraineur : Entraineur*) : void
+  +{static} clearScreen() : void
+  +{static} afficherMenu() : void
+  +{static} afficherMenuLeaders(leaders : vector<Leader*>&) : void
+  +{static} afficherMenuPokemon() : void
+  +{static} getValidChoice(min : int, max : int) : int
+  +{static} waitForEnter() : void
+  +{static} afficherPokemons(entraineur : Entraineur*) : void
 }
 
-' Relationships
+' Relationships - improved layout
 Interagir <|.. Pokemon
 Interagir <|.. Entraineur
 Interagir <|.. Combat
 
-Entraineur "1" *-- "0..6" Pokemon : has >
+Pokemon o-- Type : has >
+
 Entraineur <|-- Joueur
 Entraineur <|-- Leader
 Entraineur <|-- Maitre
+Entraineur o-- "0..6" Pokemon : owns >
 
-Combat --> "2" Entraineur : uses >
+Combat --> "1" Entraineur : player
+Combat --> "1" Entraineur : opponent
+Combat ..> Pokemon : uses >
+Combat ..> Joueur : modifies stats
+Combat ..> Leader : uses badge
+Combat ..> Maitre : uses bonus
 
-Pokemon "1" ..> "*" Type : has >
-Leader ..> "1" Gymnase : has >
+Leader o-- Gymnase : has
 
 ' Dependencies
-UI ..> Entraineur : uses >
-UI ..> Leader : uses >
-UI ..> Pokemon : uses >
+UI ..> Entraineur : displays
+UI ..> Pokemon : displays
+UI ..> Leader : displays
+UI ..> Maitre : indirect
+UI ..> Combat : indirect
 
 @enduml

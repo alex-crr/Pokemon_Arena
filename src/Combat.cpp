@@ -183,8 +183,9 @@ std::vector<std::string> Combat::effectuerTour()
         int degats;
         
         if (maitre) {
+            // Use the Master's bonus attack instead of regular attack
             degats = maitre->attaquerAvecBonus(*pokemon2, *pokemon1);
-            std::string bonusMessage = "Bonus de Maitre Pokemon appliqué!";
+            std::string bonusMessage = "Bonus de Maitre Pokemon appliqué (+25% de dégâts)!";
             tourMessages.push_back(bonusMessage);
             _messages.push_back(bonusMessage);
             afficher();

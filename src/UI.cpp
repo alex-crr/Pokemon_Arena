@@ -82,6 +82,3 @@ void UI::afficherPokemons(const Entraineur* entraineur) {
         }
     }
 }
-
-// Remove other unused methods (afficherMessagesCombat, demarrerCombat, soignerPokemons, echangerPokemons)
-// Keep only countPokemons until it's moved to Entraineur

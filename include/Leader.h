@@ -9,7 +9,7 @@
 class Leader: public Entraineur {
 public:
     /**
-     * @brief Represents different Pokémon gymnasiums
+     * @brief Représente différents gymnases Pokémon
      */
     enum class Gymnase { 
         ARGENTA,     
@@ -40,25 +40,14 @@ public:
     Gymnase getGymnase() const;
     std::string getBadge() const;
     
-    // Override
+    // Override Interagir
     virtual void afficher() const override;
     virtual std::string interagir() const override;
 
-    // Static methods for Gymnase enum
-    /**
-     * Converts a Gymnase enum value to its string representation
-     * @param gym The Gymnase enum value
-     * @return The full display name of the gym
-     */
+    //Gymnase
     static std::string GymToString(Gymnase gym);
-    
-    /**
-     * Converts a string to a Gymnase enum value
-     * @param gymnaseStr String representing the gymnasium
-     * @return Corresponding Gymnase enum value
-     */
     static Gymnase StringToGym(const std::string& gymnaseStr);
 
-    // Static method to load leaders from file
+    // Loader
     static std::vector<Leader*> chargerLeaders(const std::string& nomFichier, const std::vector<Pokemon*>& pokemons);
 };

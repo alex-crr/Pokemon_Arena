@@ -148,9 +148,10 @@ std::vector<Leader*> Leader::chargerLeaders(const std::string& nomFichier, const
 }
 
 /**
- * @brief Implementation of the interagir method for Leader
- * @return Message from the Leader when interacted with
+ * @brief Implémentation de la méthode interagir pour Leader
+ * @return Message du Leader lors de l'interaction
  */
+// pas utilisée pcke je faisde la figuration
 std::string Leader::interagir() const
 {
     if (!_estVaincu) {
@@ -163,9 +164,9 @@ std::string Leader::interagir() const
 }
 
 /**
- * Converts a Gymnase enum value to its string representation
- * @param gym The Gymnase enum value
- * @return The full display name of the gym
+ * @brief Convertit une valeur énumérée Gymnase en sa représentation sous forme de chaîne
+ * @param gym La valeur énumérée Gymnase
+ * @return Le nom complet du gymnase
  */
 std::string Leader::GymToString(Gymnase gym) {
     switch(gym) {
@@ -182,9 +183,9 @@ std::string Leader::GymToString(Gymnase gym) {
 }
 
 /**
- * Converts a string to a Gymnase enum value
- * @param gymnaseStr String representing the gymnasium
- * @return Corresponding Gymnase enum value
+ * @brief Convertit une chaîne en une valeur énumérée Gymnase
+ * @param gymnaseStr Chaîne représentant le gymnase
+ * @return Valeur énumérée Gymnase correspondante
  */
 Leader::Gymnase Leader::StringToGym(const std::string& gymnaseStr) {
     if (gymnaseStr == "Arène d'Argenta") return Gymnase::ARGENTA;

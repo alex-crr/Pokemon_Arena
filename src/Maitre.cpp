@@ -32,13 +32,13 @@ Maitre::~Maitre()
 
 /**
  * @brief Attaque avec bonus de dégâts de 25%
- * @param pokemonAllié Pokémon qui attaque
+ * @param pokemonAllie Pokémon qui attaque
  * @param cible Pokémon cible de l'attaque
  * @return Dégâts infligés avec le bonus
  */
-int Maitre::attaquerAvecBonus(Pokemon& pokemonAllié, Pokemon& cible) const
+int Maitre::attaquerAvecBonus(Pokemon& pokemonAllie, Pokemon& cible) const
 {
-    int degatsBase = pokemonAllié.attaquer(cible);
+    int degatsBase = pokemonAllie.attaquer(cible);
     // Les dégâts ont déjà été appliqués par la méthode attaquer
     // Retournons juste le montant des dégâts avec le bonus pour information
     return static_cast<int>(degatsBase * BONUS_DEGATS);

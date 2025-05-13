@@ -8,7 +8,6 @@
 Entraineur::Entraineur(const std::string& nom)
     : _nom(nom), _estVaincu(false)
 {
-    // Initialize pokemons array with nullptr
     for (int i = 0; i < 6; i++) {
         _pokemons[i] = nullptr;
     }
@@ -29,7 +28,6 @@ Entraineur::Entraineur(const std::string& nom, const std::array<Pokemon*, 6>& po
  */
 Entraineur::~Entraineur()
 {
-    // Clean up Pokemon pointers - assume Entraineur owns the Pokemon
     for (int i = 0; i < 6; i++) {
         if (_pokemons[i] != nullptr) {
             delete _pokemons[i];
@@ -104,10 +102,10 @@ bool Entraineur::estKO() const
 {
     for (const auto& pokemon : _pokemons) {
         if (pokemon != nullptr && pokemon->getHp() > 0) {
-            return false; // At least one Pokemon is not KO
+            return false; 
         }
     }
-    return true; // All Pokemon are KO or nullptr
+    return true;
 }
 
 /**

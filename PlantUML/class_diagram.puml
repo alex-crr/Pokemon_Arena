@@ -1,0 +1,201 @@
+@startuml Pokemon Arena - Class Diagram
+
+' Interface and base class
+interface Interagir {
+  +{abstract} ~Interagir() : void
+  +{abstract} interagir() : string
+  +{abstract} afficher() : void
+}
+
+enum Type {
+  FEU
+  EAU
+  PLANTE
+  ELECTRIK
+  GLACE
+  COMBAT
+  POISON
+  SOL
+  VOL
+  PSY
+  INSECTE
+  ROCHE
+  SPECTRE
+  DRAGON
+  TENEBRES
+  ACIER
+  FEE
+  NORMAL
+}
+
+' Main classes
+class Pokemon {
+  -_nom : string
+  -_types : vector<Type>
+  -_hp : int
+  -_maxHp : int
+  -_nomAttaque : string
+  -_degatsAttaque : int
+  -static _faiblesses : unordered_map<Type, vector<Type>>
+  -static _resistances : unordered_map<Type, vector<Type>>
+  -static _typesInitialized : bool
+  -static MULTI_WEAK : const double = 2.0
+  -static MULTI_RESIST : const double = 0.5
+  -static MULTI_NORMAL : const double = 1.0
+  -static initTypeEffectiveness() : void
+  
+  +Pokemon(nom : string, types : vector<Type>, hp : int, nomAttaque : string, degatsAttaque : int)
+  +Pokemon(other : Pokemon&)
+  +virtual ~Pokemon()
+  +getNom() : string
+  +getTypes() : vector<Type>
+  +getHp() : int
+  +getMaxHp() : int
+  +getNomAttaque() : string
+  +getDegatsAttaque() : int
+  +soigner() : void
+  +calculerMultiplicateurType(typeAttaque : Type) : double
+  +attaquer(cible : Pokemon&) : int
+  +recevoirAttaque(degats : int, typeAttaque : Type) : int
+  +getDetailedInfo() : string
+  +ToString() : string
+  +static chargerPokemons(nomFichier : string) : vector<Pokemon*>
+  +static stringToType(typeStr : string) : Type
+  +static typeToString(type : Type) : string
+  +static getMultiplicateur(typeDefense : Type, typeAttaque : Type) : double
+  +static getWeaknesses(type : Type) : vector<Type>
+  +static getResistances(type : Type) : vector<Type>
+  +interagir() : string
+  +afficher() : void
+}
+
+class Entraineur {
+  #_nom : string
+  #_pokemons : array<Pokemon*, 6>
+  #_estVaincu : bool
+  
+  +Entraineur(nom : string)
+  +Entraineur(nom : string, pokemons : array<Pokemon*, 6>&)
+  +virtual ~Entraineur()
+  +getNom() : string
+  +getPokemons() : array<Pokemon*, 6>&
+  +getPokemon(index : int) : Pokemon*
+  +getEstVaincu() : bool
+  +setPokemon(index : int, pokemon : Pokemon*) : void
+  +setEstVaincu(estVaincu : bool) : void
+  +estKO() : bool
+  +interagir() : string
+  +afficher() : void
+  +soignerPokemons() : void
+  +echangerPokemons(index1 : int, index2 : int) : void
+  +countPokemons() : int
+}
+
+class Joueur {
+  -_nbVictoires : int
+  -_nbDefaites : int
+  -_nbBadges : int
+  
+  +Joueur(nom : string)
+  +Joueur(nom : string, pokemons : array<Pokemon*, 6>&)
+  +virtual ~Joueur()
+  +getNbVictoires() : int
+  +getNbDefaites() : int
+  +getNbBadges() : int
+  +incrementVictoires() : void
+  +incrementDefaites() : void
+  +incrementBadges() : void
+  +static chargerJoueurs(nomFichier : string, pokemons : vector<Pokemon*>&) : vector<Joueur*>
+  +afficher() : void
+}
+
+enum Gymnase {
+  ARGENTA
+  AZURIA
+  CARMIN
+  CELADOPOLE
+  PARMANIE
+  SAFRANIA
+  CRAMOISILE
+  JADIELLE
+}
+
+class Leader {
+  -_gymnase : Gymnase
+  -_badge : string
+  
+  +Leader(nom : string, gymnase : Gymnase)
+  +Leader(nom : string, gymnase : Gymnase, pokemons : array<Pokemon*, 6>&)
+  +Leader(nom : string, gymnase : Gymnase, badge : string)
+  +Leader(nom : string, gymnase : Gymnase, badge : string, pokemons : array<Pokemon*, 6>&)
+  +virtual ~Leader()
+  +getGymnase() : Gymnase
+  +getBadge() : string
+  +afficher() : void
+  +interagir() : string
+  +static GymToString(gym : Gymnase) : string
+  +static StringToGym(gymnaseStr : string) : Gymnase
+  +static chargerLeaders(nomFichier : string, pokemons : vector<Pokemon*>&) : vector<Leader*>
+}
+
+class Maitre {
+  -BONUS_DEGATS : const double = 1.25
+  
+  +Maitre(nom : string)
+  +Maitre(nom : string, pokemons : array<Pokemon*, 6>&)
+  +virtual ~Maitre()
+  +attaquerAvecBonus(pokemonAllie : Pokemon&, cible : Pokemon&) : int
+  +afficher() : void
+  +static chargerMaitres(nomFichier : string, pokemons : vector<Pokemon*>&) : vector<Maitre*>
+}
+
+class Combat {
+  -_entraineur1 : Entraineur*
+  -_entraineur2 : Entraineur*
+  -_indexPokemon1 : int
+  -_indexPokemon2 : int
+  -_combatTermine : bool
+  -_messages : vector<string>
+  
+  +Combat(entraineur1 : Entraineur*, entraineur2 : Entraineur*)
+  +demarrer() : vector<string>
+  +effectuerTour() : vector<string>
+  +estTermine() : bool
+  +getVainqueur() : Entraineur*
+  +trouverPokemonDisponible(entraineur : Entraineur*, indexCourant : int) : int
+  +getEtatCombat() : string
+  +interagir() : string
+  +afficher() : void
+}
+
+class UI {
+  +static clearScreen() : void
+  +static afficherMenu() : void
+  +static afficherMenuLeaders(leaders : vector<Leader*>&) : void
+  +static afficherMenuPokemon() : void
+  +static getValidChoice(min : int, max : int) : int
+  +static waitForEnter() : void
+  +static afficherPokemons(entraineur : Entraineur*) : void
+}
+
+' Relationships
+Interagir <|.. Pokemon
+Interagir <|.. Entraineur
+Interagir <|.. Combat
+
+Entraineur "1" *-- "0..6" Pokemon : has >
+Entraineur <|-- Joueur
+Entraineur <|-- Leader
+Entraineur <|-- Maitre
+
+Combat --> "2" Entraineur : uses >
+
+Pokemon "1" ..> "*" Type : has >
+Leader ..> "1" Gymnase : has >
+
+' Dependencies
+UI ..> Entraineur : uses >
+UI ..> Leader : uses >
+UI ..> Pokemon : uses >
+
+@enduml

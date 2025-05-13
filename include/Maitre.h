@@ -18,8 +18,8 @@ public:
     // Destructeur
     virtual ~Maitre() override;
     
-    // Methods spécifiques
-    int attaquerAvecBonus(Pokemon& pokemonAllié, Pokemon& cible) const;
+    // Methode spécifiques
+    int attaquerAvecBonus(Pokemon& pokemonAllie, Pokemon& cible) const;
     
     // Override
     virtual void afficher() const override;
